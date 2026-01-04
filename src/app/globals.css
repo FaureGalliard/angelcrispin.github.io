@@ -24,3 +24,44 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  --size: 25px;
+  --line: rgba(90, 95, 94, 0.35); 
+
+  background:
+    repeating-linear-gradient(
+      0deg,
+      var(--line) 0px,
+      var(--line) 1px,
+      transparent 1px,
+      transparent var(--size)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      var(--line) 0px,
+      var(--line) 1px,
+      transparent 1px,
+      transparent var(--size)
+    );
+
+  background-size:
+    var(--size) var(--size),
+    var(--size) var(--size);
+
+    mask-image: linear-gradient(
+    to bottom,
+    black 65%,
+    transparent 100%
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 65%,
+    transparent 100%
+  );
+}
