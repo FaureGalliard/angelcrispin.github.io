@@ -4,6 +4,14 @@
   --background: #ffffff;
   --foreground: #171717;
 }
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: none;
+}
 
 @theme inline {
   --color-background: var(--background);
