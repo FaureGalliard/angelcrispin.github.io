@@ -32,10 +32,10 @@ export default function Footer() {
             Links
           </h4>
           <ul className="space-y-2">
-            <li><a href="/" className="hover:text-white transition">Home</a></li>
-            <li><a href="/work" className="hover:text-white transition">Work</a></li>
-            <li><a href="/about" className="hover:text-white transition">About</a></li>
-            <li><a href="/contact" className="hover:text-white transition">Contact</a></li>
+            <li><link href="/" className="hover:text-white transition">Home</link></li>
+            <li><link href="/work" className="hover:text-white transition">Work</link></li>
+            <li><link href="/about" className="hover:text-white transition">About</link></li>
+            <li><link href="/contact" className="hover:text-white transition">Contact</link></li>
           </ul>
         </div>
 
