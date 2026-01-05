@@ -39,7 +39,7 @@ body {
   pointer-events: none;
 
   --size: 25px;
-  --line: rgba(90, 95, 94, 0.35); 
+  --line: rgba(75, 78, 78, 0.35); 
 
   background:
     repeating-linear-gradient(

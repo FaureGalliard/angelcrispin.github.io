@@ -59,8 +59,9 @@ export default function HeroContent() {
             variants={heroItem}
             className="text-[1rem] text-left font-bold"
           >
-            <span className="text-white">Software Developer</span>
-            <span className="text-[rgba(228,127,127,1)]"> &lt; / &gt;</span>
+            <span className="text-[rgba(66,96,197,1)]">
+              Software Developer &lt; / &gt;
+              </span>
           </motion.h2>
 
           <motion.p
