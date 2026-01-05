@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link"; 
 
 export default function Footer() {
   const [time, setTime] = useState("");
@@ -26,16 +27,23 @@ export default function Footer() {
     <footer className="border-t border-neutral-800 bg-neutral-950 text-neutral-400">
       <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-10 text-sm">
 
-        {}
         <div>
           <h4 className="mb-4 uppercase tracking-widest text-xs text-neutral-500">
             Links
           </h4>
           <ul className="space-y-2">
-            <li><link href="/" className="hover:text-white transition">Home</link></li>
-            <li><link href="/work" className="hover:text-white transition">Work</link></li>
-            <li><link href="/about" className="hover:text-white transition">About</link></li>
-            <li><link href="/contact" className="hover:text-white transition">Contact</link></li>
+            <li>
+              <Link href="/" className="hover:text-white transition">Home</Link>
+            </li>
+            <li>
+              <Link href="/work" className="hover:text-white transition">Work</Link>
+            </li>
+            <li>
+              <Link href="/about" className="hover:text-white transition">About</Link>
+            </li>
+            <li>
+              <Link href="/contact" className="hover:text-white transition">Contact</Link>
+            </li>
           </ul>
         </div>
 
