@@ -1,4 +1,4 @@
-import { Variants } from "framer-motion";
+import { Variants, easeInOut, easeOut } from "framer-motion";
 
 export const heroCard: Variants = {
   hidden: { opacity: 0, y: 24 },
@@ -7,7 +7,7 @@ export const heroCard: Variants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: "easeOut",
+      ease: easeOut, // ✅ ahora TypeScript acepta
     },
   },
 };
@@ -29,11 +29,10 @@ export const heroItem: Variants = {
     y: 0,
     transition: {
       duration: 0.35,
-      ease: "easeOut",
+      ease: easeOut, // ✅ corregido
     },
   },
 };
-
 
 export const dotVariants = {
   hidden: { opacity: 0, scale: 0.8 },
@@ -42,7 +41,7 @@ export const dotVariants = {
     scale: 1,
     transition: {
       duration: 0.3,
-      ease: "easeOut",
+      ease: easeOut, // ✅ corregido
     },
   },
 };
@@ -53,7 +52,7 @@ export const pulse = {
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: "easeInOut",
+      ease: easeInOut, // ✅ corregido
     },
   },
 };
