@@ -4,6 +4,8 @@ import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -40,7 +42,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${inter.variable} antialiased`}>
-      <body className="bg-zinc-950 text-zinc-100 font-sans">
+      <body className="bg-zinc-950 text-zinc-100 font-sans">        
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+        />
         <Navbar />
         <main className="min-h-[calc(100vh-8rem)] flex flex-col"> {}
           {children}

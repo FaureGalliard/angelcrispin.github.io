@@ -24,8 +24,8 @@ export default function Navbar() {
           {[
             { label: "Certifications", href: "#certifications" },
             { label: "Projects", href: "#projects" },
-            { label: "Stack", href: "#stack" },
-            { label: "About me", href: "#about-me" },
+            { label: "Stack", href: "#techstack" },
+            { label: "About me", href: "#about" },
             { label: "CV", href: "#cv" },
           ].map((item) => (
             <motion.a
