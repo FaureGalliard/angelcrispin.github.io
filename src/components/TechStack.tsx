@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { easeOut } from 'framer-motion';
 
 const containerVariants = {
   hidden: {},
@@ -11,13 +12,14 @@ const containerVariants = {
   },
 };
 
+
 const itemVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
       duration: 0.25,
-      ease: [0.4, 0, 0.2, 1],
+      ease: easeOut,
     },
   },
 };
