@@ -5,82 +5,104 @@ const Section = ({
   title: string;
   items: { name: string; icon: string }[];
 }) => (
-  <div>
-    <h3 className="text-zinc-100 font-medium mb-4">{title}</h3>
-    <div className="flex flex-wrap gap-4">
-      {items.map((item) => (
-        <div
-          key={item.name}
-          className="flex items-center gap-2 px-3 py-2 rounded-md border border-zinc-800 bg-zinc-900/40 hover:border-zinc-600 transition"
-        >
-          <i className={`${item.icon} text-lg`} />
-          <span className="text-sm text-zinc-300">{item.name}</span>
-        </div>
-      ))}
+  <div className="flex flex-col gap-4">
+    <h3 className="text-white  text-center">{title}</h3>
+    <div
+      className="rounded-2xl  border p-6 backdrop-blur-md bg-[rgba(13,14,15,0.9)]"
+      style={{ borderColor: "rgba(255,255,255,0.1)" }}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {items.map((item) => (
+          <div
+            key={item.name}
+            className="
+            flex flex-col items-center justify-center
+            h-16 gap
+            rounded-lg
+            transition-all duration-300 ease-in-out
+            group
+            hover:scale-105
+            hover:rotate-3
+          "
+            style={{
+              borderColor: "rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <i
+              className={`
+              ${item.icon} colored
+              text-3xl
+              filter-grayscale
+              group-hover:filter-none
+              group-hover:scale-110
+              group-hover:rotate-6
+              transition-all duration-300 ease-in-out
+            `}
+            />
+            <span className="mt-2 text-xs text-gray-400 group-hover:text-white transition-colors duration-300">
+              {item.name}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 );
 
 export default function TechStack() {
   return (
-    <section id="techstack" className="py-20">
-      <div className="max-w-6xl mx-auto px-6 space-y-10">
-        <h2 className="text-2xl font-semibold text-white">
-          Tech Stack
-        </h2>
-
-        <Section
-          title="Languages"
-          items={[
-            { name: "Python", icon: "devicon-python-plain" },
-            { name: "C++", icon: "devicon-cplusplus-plain" },
-             { name: "TypeScript", icon: "devicon-typescript-plain" },
-            { name: "Java", icon: "devicon-java-plain" },
-            
-          ]}
-        />
-
-        <Section
-          title="Backend & Systems"
-          items={[
-            { name: "Django", icon: "devicon-django-plain" },
-            { name: "Flask", icon: "devicon-flask-original" },
-            { name: "Node.js", icon: "devicon-nodejs-plain" },
-            { name: "REST APIs", icon: "devicon-fastapi-plain" },
-            { name: "Supabase", icon: "devicon-supabase-plain" },
-          ]}
-        />
-
-        
-
-        <Section
-          title="Databases"
-          items={[
-            { name: "PostgreSQL", icon: "devicon-postgresql-plain" },
-            { name: "MySQL", icon: "devicon-mysql-plain" },
-            { name: "MongoDB", icon: "devicon-mongodb-plain" },
-          ]}
-        />
-
-        <Section
-          title="DevOps"
-          items={[
-            { name: "Git", icon: "devicon-git-plain" },
-            { name: "Docker", icon: "devicon-docker-plain" },
-            { name: "CI/CD", icon: "devicon-githubactions-plain" },
-            { name: "AWS", icon: "devicon-amazonwebservices-original" },
-            { name: "Vercel", icon: "devicon-vercel-original" },
-            { name: "Cloudflare", icon: "devicon-cloudflare-plain" },
-          ]}
-        />
-
-        <Section
-          title="Frontend"
-          items={[
-            { name: "Next.js", icon: "devicon-nextjs-plain" },
-            { name: "Tailwind CSS", icon: "devicon-tailwindcss-plain" },
-          ]}
-        />
+    <section id="techstack" className="py-20 bg-[rgba(16,17,17,1)]">
+      <div className="max-w-6xl mx-auto px-6">
+        <h2 className="text-2xl font-semibold text-white mb-10">Tech Stack</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Section
+            title="Languages"
+            items={[
+              { name: "Python", icon: "devicon-python-plain colored" },
+              { name: "C++", icon: "devicon-cplusplus-plain colored" },
+              { name: "TypeScript", icon: "devicon-typescript-plain colored" },
+              { name: "Java", icon: "devicon-java-plain colored" },
+            ]}
+          />
+          <Section
+            title="Backend & Systems"
+            items={[
+              { name: "Django", icon: "devicon-django-plain" },
+              { name: "Flask", icon: "devicon-flask-original" },
+              { name: "Node.js", icon: "devicon-nodejs-plain colored" },
+              { name: "REST APIs", icon: "devicon-fastapi-plain colored" },
+              { name: "Supabase", icon: "devicon-supabase-plain colored" },
+            ]}
+          />
+          <Section
+            title="Databases"
+            items={[
+              { name: "PostgreSQL", icon: "devicon-postgresql-plain colored" },
+              { name: "MySQL", icon: "devicon-mysql-plain colored" },
+              { name: "MongoDB", icon: "devicon-mongodb-plain colored" },
+            ]}
+          />
+          <Section
+            title="DevOps"
+            items={[
+              { name: "Git", icon: "devicon-git-plain colored" },
+              { name: "Docker", icon: "devicon-docker-plain colored" },
+              { name: "CI/CD", icon: "devicon-githubactions-plain colored" },
+              { name: "Vercel", icon: "devicon-vercel-plain" },
+              { name: "Cloudflare", icon: "devicon-cloudflare-plain colored" },
+            ]}
+          />
+          <Section
+            title="Frontend"
+            items={[
+              { name: "Next.js", icon: "devicon-nextjs-plain colored" },
+              {
+                name: "Tailwind CSS",
+                icon: "devicon-tailwindcss-plain colored",
+              },
+            ]}
+          />
+        </div>
       </div>
     </section>
   );

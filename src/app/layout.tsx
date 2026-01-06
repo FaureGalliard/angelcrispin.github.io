@@ -42,7 +42,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${inter.variable} antialiased`}>
-      <body className="bg-zinc-950 text-zinc-100 font-sans">        
+      <body className="bg-[rgba(16,17,17,1)] text-zinc-100 font-sans">        
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"

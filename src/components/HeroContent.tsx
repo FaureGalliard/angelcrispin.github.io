@@ -13,7 +13,7 @@ export default function HeroContent() {
         initial="hidden"
         animate="show"
         className="max-w-3xl w-full rounded-2xl border border-white/10 p-10 backdrop-blur-md"
-        style={{ backgroundColor: "rgba(13, 14, 15, 0.9)" }}
+        style={{ backgroundColor: "rgba(13,14,15,0.9)" }}
       >
         <motion.div
           variants={heroContainer}

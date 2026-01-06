@@ -8,7 +8,7 @@ const projects = [
 
 export default function Projects() {
   return (
-    <section id="projects" className="py-24 px-6">
+    <section id="projects" className="py-24 px-6 bg-[rgba(16,17,17,1)]">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl font-semibold">Proyectos</h2>
 
