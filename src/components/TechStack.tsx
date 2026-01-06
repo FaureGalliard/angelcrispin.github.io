@@ -1,3 +1,27 @@
+'use client';
+
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.06,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.25,
+      ease: 'easeOut',
+    },
+  },
+};
+
 const Section = ({
   title,
   items,
@@ -6,45 +30,53 @@ const Section = ({
   items: { name: string; icon: string }[];
 }) => (
   <div className="flex flex-col gap-4">
-    <h3 className="text-white  text-center">{title}</h3>
+    <h3 className="text-white text-center">{title}</h3>
+
     <div
-      className="rounded-2xl  border p-6 backdrop-blur-md bg-[rgba(13,14,15,0.9)]"
-      style={{ borderColor: "rgba(255,255,255,0.1)" }}
+      className="rounded-2xl border p-6 backdrop-blur-md bg-[rgba(13,14,15,0.9)]"
+      style={{ borderColor: 'rgba(255,255,255,0.1)' }}
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-8"
+      >
         {items.map((item) => (
-          <div
+          <motion.div
             key={item.name}
+            variants={itemVariants}
             className="
-            flex flex-col items-center justify-center
-            h-16 gap
-            rounded-lg
-            transition-all duration-300 ease-in-out
-            group
-            hover:scale-105
-            hover:rotate-3
-          "
+              flex flex-col items-center justify-center
+              h-16 gap
+              rounded-lg
+              transition-all duration-300 ease-in-out
+              group
+              hover:scale-105
+              hover:rotate-3
+            "
             style={{
-              borderColor: "rgba(255, 255, 255, 0.1)",
+              borderColor: 'rgba(255, 255, 255, 0.1)',
             }}
           >
             <i
               className={`
-              ${item.icon} colored
-              text-3xl
-              filter-grayscale
-              group-hover:filter-none
-              group-hover:scale-110
-              group-hover:rotate-6
-              transition-all duration-300 ease-in-out
-            `}
+                ${item.icon} colored
+                text-3xl
+                filter-grayscale
+                group-hover:filter-none
+                group-hover:scale-110
+                group-hover:rotate-6
+                transition-all duration-300 ease-in-out
+              `}
             />
             <span className="mt-2 text-xs text-gray-400 group-hover:text-white transition-colors duration-300">
               {item.name}
             </span>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   </div>
 );
