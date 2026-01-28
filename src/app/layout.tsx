@@ -13,14 +13,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Ángel Crispín | Ingeniería & Software",
-  description: "Ingeniero de Software, Estadística y Proyectos Tecnológicos",
+  title: "Ángel Crispín Ingeniero de Software",
+  description: "Ingeniero de Software, Data Science  y Proyectos Tecnológicos",
   icons: {
     icon: "/favicon.ico", 
   },
   openGraph: {
-    title: "Ángel Crispín | Ingeniería & Software",
-    description: "Ingeniero de Software, Estadística y Proyectos Tecnológicos",
+    title: "Ángel Crispín | Ingeniero de Software",
+    description: "Ingeniero de Software, Data Science y Proyectos Tecnológicos",
     url: "https://angelcrispin.dev", 
     siteName: "Ángel Crispín",
     images: [
