@@ -68,7 +68,7 @@ export default function HeroContent() {
             variants={heroItem}
             className="mt-4 max-w-xl text-left text-sm leading-relaxed text-gray-300"
           >
-            Desarrollo aplicaciones y sistemas tecnológicos, integrando lógica y arquitectura, con una mentalidad de ingeniería.
+           Desarrollo sistemas y aplicaciones con enfoque en lógica, arquitectura y eficiencia.
           </motion.p>
 
           <motion.div

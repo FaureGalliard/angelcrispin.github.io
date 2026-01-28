@@ -5,7 +5,7 @@ export default function About() {
         <h2 className="text-3xl font-semibold">Sobre mí</h2>
 
         <p className="mt-6 text-zinc-400 max-w-3xl leading-relaxed">
-          Ingeniero de Software orientado a la automatización y al diseño de soluciones eficientes. Construyo sistemas desde cero, optimizo procesos reales y trabajo con datos para resolver problemas concretos. Me apasiona el código limpio, el rendimiento y transformar ideas técnicas en productos funcionales con impacto.
+          Desarrollo sistemas y aplicaciones con enfoque en lógica, arquitectura y eficiencia.
         </p>
       </div>
     </section>
