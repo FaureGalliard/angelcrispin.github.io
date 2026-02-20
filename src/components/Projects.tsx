@@ -125,6 +125,7 @@ const projects: Project[] = [
     ],
     tech: ["Python", "Node.js", "IoT"],
     type: "automation",
+    github: null,
     featureGroups: [],
     pipeline: [],
     gestures: [],
