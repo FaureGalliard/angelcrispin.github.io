@@ -1,7 +1,26 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-const projects = [
+
+// ─── Types ──────────────────────────────────────────────────────────────────
+interface Video        { url: string; label: string; }
+interface Gesture      { key: string; label: string; color: string; }
+interface PipelineStep { icon: string; label: string; sub: string; }
+interface FeatureGroup { icon: string; label: string; color: string; items: string[]; }
+interface Project {
+  title:         string;
+  description:   string;
+  tech:          string[];
+  type:          string;
+  github:        string | null;
+  highlights:    string[];
+  gestures:      Gesture[];
+  pipeline:      PipelineStep[];
+  featureGroups: FeatureGroup[];
+  videos:        Video[];
+}
+
+const projects: Project[] = [
   {
     title: "Save the Valley",
     description:
@@ -52,10 +71,13 @@ const projects = [
         ],
       },
     ],
+    highlights: [],
+    gestures: [],
+    pipeline: [],
     videos: [
       { url: "https://res.cloudinary.com/doq5qdh7g/video/upload/v1771550483/WorldGeneration_ec6tqz.mov", label: "World Gen" },
       { url: "https://res.cloudinary.com/doq5qdh7g/video/upload/v1771550482/CombatSystem_bxf0de.mov", label: "Combate" },
-    ]
+    ],
   },
   {
     title: "GestureKey",
@@ -71,20 +93,27 @@ const projects = [
     tech: ["Python", "OpenCV", "MediaPipe", "Scikit-learn", "PyQt6"],
     type: "ml",
     github: null,
+    featureGroups: [],
     pipeline: [
       { icon: "📷", label: "Captura", sub: "OpenCV" },
       { icon: "🖐", label: "Landmarks", sub: "MediaPipe" },
       { icon: "🧠", label: "Clasifica", sub: "Random Forest" },
       { icon: "⚡", label: "Acción", sub: "Gesture Engine" },
     ],
-    
+    gestures: [
+      { key: "TWO_FINGERS", label: "Scroll", color: "#50dc8a" },
+      { key: "THREE_FINGERS", label: "Volumen", color: "#50c8dc" },
+      { key: "PINCH", label: "Zoom", color: "#a078dc" },
+      { key: "PALM→FIST", label: "Pausa", color: "#dc8c50" },
+      { key: "PALM×2", label: "Task View", color: "#dc5078" },
+    ],
     videos: [
       { url: "https://res.cloudinary.com/doq5qdh7g/video/upload/v1771550474/Scroll_bkjocl.mov", label: "Scroll" },
       { url: "https://res.cloudinary.com/doq5qdh7g/video/upload/v1771550473/Volume_tozkwu.mov", label: "Volumen" },
       { url: "https://res.cloudinary.com/doq5qdh7g/video/upload/v1771550472/task_view_ghj9qr.mov", label: "Task View" },
       { url: "https://res.cloudinary.com/doq5qdh7g/video/upload/v1771550471/Pause_u8vjtl.mp4", label: "Pausa" },
       { url: "https://res.cloudinary.com/doq5qdh7g/video/upload/v1771550851/trayapp_dwqkxm.mp4", label: "Tray App" },
-    ]
+    ],
   },
   {
     title: "Automatización & Sistemas",
@@ -96,16 +125,19 @@ const projects = [
     ],
     tech: ["Python", "Node.js", "IoT"],
     type: "automation",
-    videos: []
-  }
+    featureGroups: [],
+    pipeline: [],
+    gestures: [],
+    videos: [],
+  },
 ];
 
-// ─── GameFeaturePanel — panel de características para el juego ─────────────
-function GameFeaturePanel({ featureGroups, activeGroup, onSelect }) {
+// ─── GameFeaturePanel ───────────────────────────────────────────────────────
+function GameFeaturePanel({ featureGroups, activeGroup, onSelect }: { featureGroups: FeatureGroup[]; activeGroup: number; onSelect: (i: number) => void; }) {
   const group = featureGroups[activeGroup];
+  if (!group) return null;
   return (
-    <div className="flex flex-col gap-3 h-full">
-      {/* Tabs de categoría */}
+    <div className="flex flex-col gap-3">
       <div className="flex gap-2 flex-wrap">
         {featureGroups.map((g, idx) => (
           <button
@@ -123,10 +155,8 @@ function GameFeaturePanel({ featureGroups, activeGroup, onSelect }) {
           </button>
         ))}
       </div>
-
-      {/* Contenido del grupo activo */}
       <div
-        className="flex-1 rounded-xl p-4 border transition-all"
+        className="rounded-xl p-4 border transition-all"
         style={{ borderColor: group.color + '30', backgroundColor: group.color + '08' }}
       >
         <div className="flex items-center gap-2 mb-3">
@@ -144,24 +174,19 @@ function GameFeaturePanel({ featureGroups, activeGroup, onSelect }) {
           ))}
         </ul>
       </div>
-
-      {/* Stats del juego */}
-     
     </div>
   );
 }
 
-// ─── GameVideoPanel — video con selector de demo para el juego ─────────────
-function GameVideoPanel({ videos, currentVideo, onVideoEnd, onSelect }) {
+// ─── GameVideoPanel ─────────────────────────────────────────────────────────
+function GameVideoPanel({ videos, currentVideo, onVideoEnd, onSelect }: { videos: Video[]; currentVideo: number; onVideoEnd: () => void; onSelect: (i: number) => void; }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="relative aspect-video rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
         <video
           key={videos[currentVideo].url}
           src={videos[currentVideo].url}
-          autoPlay
-          muted
-          playsInline
+          autoPlay muted playsInline
           onEnded={onVideoEnd}
           className="w-full h-full object-cover"
         />
@@ -202,7 +227,7 @@ function GameVideoPanel({ videos, currentVideo, onVideoEnd, onSelect }) {
 }
 
 // ─── PipelineRow ────────────────────────────────────────────────────────────
-function PipelineRow({ pipeline }) {
+function PipelineRow({ pipeline }: { pipeline: PipelineStep[]; }) {
   return (
     <div className="flex items-center gap-1 flex-wrap">
       {pipeline.map((step, i) => (
@@ -222,7 +247,7 @@ function PipelineRow({ pipeline }) {
 }
 
 // ─── GestureChips ───────────────────────────────────────────────────────────
-function GestureChips({ gestures }) {
+function GestureChips({ gestures }: { gestures: Gesture[]; }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {gestures.map((g) => (
@@ -239,7 +264,7 @@ function GestureChips({ gestures }) {
 }
 
 // ─── GestureVideoPanel ──────────────────────────────────────────────────────
-function GestureVideoPanel({ videos, currentVideo, onVideoEnd, onSelect }) {
+function GestureVideoPanel({ videos, currentVideo, onVideoEnd, onSelect }: { videos: Video[]; currentVideo: number; onVideoEnd: () => void; onSelect: (i: number) => void; }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="relative aspect-video rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
@@ -286,17 +311,13 @@ function GestureVideoPanel({ videos, currentVideo, onVideoEnd, onSelect }) {
   );
 }
 
-// ─── GitHub button ──────────────────────────────────────────────────────────
-
-
-// ─── ProjectInfo — panel izquierdo dinámico por tipo ───────────────────────
-function ProjectInfo({ project, currentVideo, setCurrentVideo, activeFeature, setActiveFeature }) {
+// ─── ProjectInfo ────────────────────────────────────────────────────────────
+function ProjectInfo({ project, activeFeature, setActiveFeature }: { project: Project; activeFeature: number; setActiveFeature: (i: number) => void; }) {
   const isGame    = project.type === 'game';
   const isGesture = project.type === 'ml';
 
   return (
     <div className="flex flex-col justify-center space-y-5">
-      {/* Título + badge */}
       <div>
         <h3 className="text-2xl font-bold">{project.title}</h3>
         <div className="flex flex-wrap gap-2 mt-1.5">
@@ -316,8 +337,7 @@ function ProjectInfo({ project, currentVideo, setCurrentVideo, activeFeature, se
 
       <p className="text-zinc-400 leading-relaxed text-sm">{project.description}</p>
 
-      {/* Game: panel de features con tabs */}
-      {isGame && project.featureGroups && (
+      {isGame && project.featureGroups.length > 0 && (
         <GameFeaturePanel
           featureGroups={project.featureGroups}
           activeGroup={activeFeature}
@@ -325,16 +345,15 @@ function ProjectInfo({ project, currentVideo, setCurrentVideo, activeFeature, se
         />
       )}
 
-      {/* GestureKey: pipeline + highlights + gestos */}
       {isGesture && (
         <>
-          {project.pipeline && (
+          {project.pipeline.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-zinc-600 text-xs uppercase tracking-wider">Pipeline</p>
               <PipelineRow pipeline={project.pipeline} />
             </div>
           )}
-          {project.highlights && (
+          {project.highlights.length > 0 && (
             <ul className="space-y-1.5">
               {project.highlights.map((h) => (
                 <li key={h} className="text-zinc-500 flex items-start text-sm">
@@ -344,7 +363,7 @@ function ProjectInfo({ project, currentVideo, setCurrentVideo, activeFeature, se
               ))}
             </ul>
           )}
-          {project.gestures && (
+          {project.gestures.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-zinc-600 text-xs uppercase tracking-wider">Gestos detectados</p>
               <GestureChips gestures={project.gestures} />
@@ -353,8 +372,7 @@ function ProjectInfo({ project, currentVideo, setCurrentVideo, activeFeature, se
         </>
       )}
 
-      {/* Otros proyectos: highlights genéricos */}
-      {!isGame && !isGesture && project.highlights && (
+      {!isGame && !isGesture && project.highlights.length > 0 && (
         <ul className="space-y-1.5">
           {project.highlights.map((h) => (
             <li key={h} className="text-zinc-500 flex items-start text-sm">
@@ -365,24 +383,39 @@ function ProjectInfo({ project, currentVideo, setCurrentVideo, activeFeature, se
         </ul>
       )}
 
-      {/* Tech */}
       <div className="flex flex-wrap gap-2">
-        {project.tech && project.tech.map((t) => (
+        {project.tech.map((t) => (
           <span key={t} className="px-3 py-1 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs">
             {t}
           </span>
         ))}
       </div>
 
+      {project.github && (
+        <a
+          href={`https://github.com/${project.github}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-emerald-500 transition-all group w-fit"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          <span>Ver código</span>
+          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      )}
     </div>
   );
 }
 
-// ─── ProjectMedia — panel derecho dinámico ──────────────────────────────────
-function ProjectMedia({ project, currentVideo, setCurrentVideo }) {
+// ─── ProjectMedia ────────────────────────────────────────────────────────────
+function ProjectMedia({ project, currentVideo, setCurrentVideo }: { project: Project; currentVideo: number; setCurrentVideo: React.Dispatch<React.SetStateAction<number>>; }) {
   const isGame    = project.type === 'game';
   const isGesture = project.type === 'ml';
-  const hasVideos = project.videos && project.videos.length > 0;
+  const hasVideos = project.videos.length > 0;
 
   const handleVideoEnd = () => {
     if (hasVideos && project.videos.length > 1)
@@ -471,8 +504,6 @@ export default function Projects() {
         <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto px-6">
           <ProjectInfo
             project={project}
-            currentVideo={currentVideo}
-            setCurrentVideo={setCurrentVideo}
             activeFeature={activeFeature}
             setActiveFeature={setActiveFeature}
           />
@@ -485,7 +516,6 @@ export default function Projects() {
           </div>
         </div>
 
-        {/* Navegación */}
         <div className="max-w-7xl mx-auto px-6 mt-12">
           <div className="flex items-center justify-between">
             <button
