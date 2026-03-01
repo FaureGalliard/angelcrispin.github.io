@@ -1,11 +1,19 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; 
+import { Inter,Fira_Code, JetBrains_Mono } from "next/font/google"; 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 
+const firaCode = Fira_Code({
+  subsets: ['latin'],
+  variable: '--font-fira-code',
+})
 
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+})
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -41,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`${inter.variable} antialiased`}>
+    <html lang="es" className={`${inter.variable} ${firaCode.variable} ${jetbrainsMono.variable} antialiased`}>
       <body className="bg-[rgba(16,17,17,1)] text-zinc-100 font-sans">        
         <link
           rel="stylesheet"

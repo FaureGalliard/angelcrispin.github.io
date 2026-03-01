@@ -1,3 +1,5 @@
+'use client'
+import React, {useState} from 'react';
 // ─── Types ──────────────────────────────────────────────────────────────────
 export interface Video        { url: string; label: string; }
 export interface Gesture      { key: string; label: string; color: string; }
@@ -129,7 +131,7 @@ export const projects: Project[] = [
     videos: [],
   },
   {
-  title: "Sastrería Marcel's – Web & Dashboard",
+  title: "Sastrería Landing Page",
   description:
     "Sistema web fullstack desarrollado para un negocio local real. Combina una landing page orientada a conversión con un panel administrativo privado para gestión de citas. Actualmente en producción y en uso por el cliente.",
   tech: ["Next.js", "React", "Supabase", "Tailwind CSS", "Framer Motion", "TypeScript"],
