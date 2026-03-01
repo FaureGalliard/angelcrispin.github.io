@@ -40,7 +40,7 @@ const ImagePanel: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
       width={800}
       height={600}
       priority
-      className="w-full h-auto object-cover grayscale group-hover:grayscale-0 transform group-hover:scale-105 transition-all duration-500"
+      className="w-full h-auto object-cover   transform group-hover:scale-105 transition-all duration-500"
     />
   </div>
 );
@@ -77,7 +77,7 @@ export default function AboutMe() {
             >
               <CodeBlockHeader filename="profile.img" />
               <ImagePanel
-                src="https://storage.googleapis.com/uxpilot-auth.appspot.com/12d0d63973-40cfd2ed0460d3bf5207.png"
+                src="https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg"
                 alt="professional headshot of a software engineer, cinematic lighting, tech background, high quality photography"
               />
             </div>
