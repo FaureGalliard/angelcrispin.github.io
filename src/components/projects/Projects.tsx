@@ -3,7 +3,20 @@ import React, { useState } from 'react';
 import type { Project, Video } from '@/data/Projects';
 import { projects } from '@/data/Projects';
 
-const PRIMARY = '#4a6ef5';
+// ─── Colors ───────────────────────────────────────────────────────────────────
+const C = {
+  bg:        '#0e0e0e',
+  surface:   '#1a1a1a',
+  border:    '#2a2a2a',
+  primary:   '#4d9fff',
+  muted:     '#6b7280',
+  mutedDim:  'rgba(107,114,128,0.6)',
+  white:     '#ffffff',
+  dotRed:    '#ff5f57',
+  dotYellow: '#febc2e',
+  dotGreen:  '#28c840',
+  sectionBg: 'rgba(26,26,26,0.3)',
+};
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 const GithubIcon = () => (
@@ -18,33 +31,35 @@ const ExternalLinkIcon = () => (
   </svg>
 );
 
-const FolderIcon = () => (
-  <svg className="w-10 h-10" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
-    <path d="M0 96C0 60.7 28.7 32 64 32H196.1c19.1 0 37.4 7.6 50.9 21.1L289.9 96H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM64 80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H448c8.8 0 16-7.2 16-16V160c0-8.8-7.2-16-16-16H286.6c-10.6 0-20.8-4.2-28.3-11.7L213.1 87c-4.5-4.5-10.6-7-17-7H64z" />
-  </svg>
-);
-
-// ─── Window controls ──────────────────────────────────────────────────────────
+// ─── Window Controls ──────────────────────────────────────────────────────────
 const WindowControls: React.FC = () => (
   <div className="flex gap-2">
-    <div className="w-3 h-3 rounded-full bg-red-500" />
-    <div className="w-3 h-3 rounded-full bg-yellow-400" />
-    <div className="w-3 h-3 rounded-full bg-green-500" />
+    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: C.dotRed }} />
+    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: C.dotYellow }} />
+    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: C.dotGreen }} />
   </div>
 );
 
+// ─── Code Block Header ────────────────────────────────────────────────────────
 const CodeBlockHeader: React.FC<{ filename?: string }> = ({ filename }) => (
-  <div className="flex items-center px-4 py-3 bg-zinc-800 border-b border-zinc-700 rounded-t-lg">
+  <div
+    className="flex items-center px-4 py-3 border-b rounded-t-lg"
+    style={{ backgroundColor: C.surface, borderColor: C.border }}
+  >
     <WindowControls />
     {filename && (
-      <span className="ml-4 text-xs text-zinc-400 font-mono">{filename}</span>
+      <span className="ml-4 text-xs font-mono" style={{ color: C.muted }}>
+        {filename}
+      </span>
     )}
   </div>
 );
 
-// ─── Video panel ─────────────────────────────────────────────────────────────
+// ─── Video Panel ──────────────────────────────────────────────────────────────
 function VideoPanel({
-  videos, currentVideo, setCurrentVideo,
+  videos,
+  currentVideo,
+  setCurrentVideo,
 }: {
   videos: Video[];
   currentVideo: number;
@@ -52,35 +67,56 @@ function VideoPanel({
 }) {
   return (
     <div className="relative overflow-hidden group">
-      <div className="w-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
       <video
         key={videos[currentVideo].url}
         src={videos[currentVideo].url}
-        autoPlay muted playsInline
+        autoPlay
+        muted
+        playsInline
         onEnded={() => setCurrentVideo((p) => (p + 1) % videos.length)}
-        className="w-full object-cover transform group-hover:scale-105 transition-transform duration-500  "
+        className="w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
       />
-      
+
       {/* dot nav */}
       {videos.length > 1 && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
-          {videos.map((_, i) => (
+          {videos.map((v, i) => (
             <button
               key={i}
               onClick={() => setCurrentVideo(i)}
-              className={`h-1 rounded-full transition-all ${i === currentVideo ? 'w-10' : 'w-6 bg-white/30 hover:bg-white/50'}`}
-              style={i === currentVideo ? { width: '1.5rem', backgroundColor: PRIMARY } : {}}
+              title={v.label}
+              className="h-1 rounded-full transition-all"
+              style={{
+                width: i === currentVideo ? '1.5rem' : '1.25rem',
+                backgroundColor:
+                  i === currentVideo ? C.primary : 'rgba(255,255,255,0.3)',
+              }}
             />
           ))}
         </div>
       )}
-      {/* tab buttons */}
-      
     </div>
   );
 }
 
-// ─── FeaturedProjectCard ──────────────────────────────────────────────────────
+// ─── No-Preview Placeholder ───────────────────────────────────────────────────
+const NoPreview: React.FC<{ type: string }> = ({ type }) => (
+  <div
+    className="w-full aspect-video flex flex-col items-center justify-center gap-2"
+    style={{
+      background: `linear-gradient(135deg, ${C.surface} 0%, #111111 100%)`,
+    }}
+  >
+    <span className="text-4xl opacity-20">
+      {type === 'game' ? '🎮' : type === 'ml' ? '🤖' : '⚙️'}
+    </span>
+    <span className="text-xs font-mono" style={{ color: C.border }}>
+      sin preview
+    </span>
+  </div>
+);
+
+// ─── Featured Project Card ────────────────────────────────────────────────────
 interface FeaturedProjectCardProps {
   project: Project;
   index: number;
@@ -88,13 +124,20 @@ interface FeaturedProjectCardProps {
 
 const FeaturedProjectCard: React.FC<FeaturedProjectCardProps> = ({ project, index }) => {
   const [currentVideo, setCurrentVideo] = useState(0);
-
   const reversed  = index % 2 !== 0;
   const hasVideos = project.videos.length > 0;
-  const filename = `${project.title.replace(/\s+/g, "_")}.mp4`;
+  const filename  = `${project.title.replace(/\s+/g, '_')}.mp4`;
+
   const imageBlock = (
-    <div className={`lg:col-span-7 relative group cursor-pointer ${reversed ? 'order-1 lg:order-2' : ''}`}>
-      <div className="rounded-lg overflow-hidden shadow-2xl border border-zinc-700">
+    <div
+      className={`lg:col-span-7 relative group cursor-pointer ${
+        reversed ? 'order-1 lg:order-2' : ''
+      }`}
+    >
+      <div
+        className="rounded-lg overflow-hidden shadow-2xl border"
+        style={{ borderColor: C.border, borderRadius: '8px' }}
+      >
         <CodeBlockHeader filename={filename} />
         <div className="relative overflow-hidden">
           {hasVideos ? (
@@ -104,10 +147,7 @@ const FeaturedProjectCard: React.FC<FeaturedProjectCardProps> = ({ project, inde
               setCurrentVideo={setCurrentVideo}
             />
           ) : (
-            <div className="w-full aspect-video bg-gradient-to-br from-zinc-800 to-zinc-900 flex flex-col items-center justify-center gap-2">
-              <span className="text-4xl opacity-20">{project.type === 'game' ? '🎮' : project.type === 'ml' ? '🤖' : '⚙️'}</span>
-              <span className="text-zinc-600 text-xs font-mono">sin preview</span>
-            </div>
+            <NoPreview type={project.type} />
           )}
         </div>
       </div>
@@ -115,54 +155,120 @@ const FeaturedProjectCard: React.FC<FeaturedProjectCardProps> = ({ project, inde
   );
 
   const infoBlock = (
-    <div className={`lg:col-span-5 flex flex-col z-20 ${reversed ? 'lg:items-start order-2 lg:order-1' : 'lg:text-right lg:items-end'}`}>
-      <p className="font-jetbrains text-sm mb-2" style={{ color: PRIMARY }}>Featured Project</p>
-      <h3 className="text-2xl font-jetbrains font-bold text-white mb-4 transition-colors cursor-pointer hover:opacity-80">
+    <div
+      className={`lg:col-span-5 flex flex-col z-20 ${
+        reversed
+          ? 'lg:items-start order-2 lg:order-1'
+          : 'lg:text-right lg:items-end'
+      }`}
+    >
+      {/* label */}
+      <p className="font-mono text-sm mb-2" style={{ color: C.primary }}>
+        Featured Project
+      </p>
+
+      {/* title */}
+      <h3
+        className="text-2xl font-bold mb-4 cursor-pointer transition-opacity hover:opacity-75"
+        style={{ color: C.white }}
+      >
         {project.title}
       </h3>
 
       {/* floating description card */}
-      <div className={`bg-[#1a1a1a] font-firacode p-6 rounded-lg shadow-xl border border-zinc-700 mb-4 text-zinc-400 text-sm leading-relaxed backdrop-blur-sm relative z-20 ${reversed ? 'lg:-mr-16' : 'lg:-ml-16'}`}>
+      <div
+        className={`p-6 rounded-lg shadow-xl border mb-4 text-sm leading-relaxed backdrop-blur-sm relative z-20 font-mono ${
+          reversed ? 'lg:-mr-16' : 'lg:-ml-16'
+        }`}
+        style={{
+          backgroundColor: C.surface,
+          borderColor: C.border,
+          color: C.muted,
+        }}
+      >
         {project.description}
       </div>
 
       {/* tech stack */}
-      <ul className={`font-firacode flex flex-wrap gap-4 text-xs  text-zinc-400 mb-6 ${reversed ? '' : 'lg:justify-end'}`}>
-        {project.tech.map((t) => <li key={t}>{t}</li>)}
+      <ul
+        className={`flex flex-wrap gap-4 text-xs font-mono mb-6 ${
+          reversed ? '' : 'lg:justify-end'
+        }`}
+        style={{ color: C.muted }}
+      >
+        {project.tech.map((t) => (
+          <li key={t}>{t}</li>
+        ))}
       </ul>
 
       {/* action icons */}
-      <div className={`flex gap-4 text-white ${reversed ? '' : 'lg:justify-end'}`}>
-        {project.github && (
-          <a href={`https://github.com/${project.github}`} target="_blank" rel="noopener noreferrer"
-            className="transition-colors hover:opacity-70 color-white">
-            <GithubIcon />
-          </a>
-        )}
+      <div
+        className={`flex gap-4 ${reversed ? '' : 'lg:justify-end'}`}
+        style={{ color: C.white }}
+      >
+        <a
+          href={project.github ? `https://github.com/${project.github}` : '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-colors"
+          onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
+          onMouseLeave={(e) => (e.currentTarget.style.color = C.white)}
+        >
+          <GithubIcon />
+        </a>
+        <a
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-colors"
+          onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
+          onMouseLeave={(e) => (e.currentTarget.style.color = C.white)}
+        >
+          <ExternalLinkIcon />
+        </a>
       </div>
     </div>
   );
 
   return (
     <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-      {reversed ? <>{infoBlock}{imageBlock}</> : <>{imageBlock}{infoBlock}</>}
+      {reversed ? (
+        <>
+          {infoBlock}
+          {imageBlock}
+        </>
+      ) : (
+        <>
+          {imageBlock}
+          {infoBlock}
+        </>
+      )}
     </div>
   );
 };
 
-// ─── Main section ─────────────────────────────────────────────────────────────
+// ─── Projects Section ─────────────────────────────────────────────────────────
 const Projects: React.FC = () => {
   return (
-    <section id="projects" className="py-24 bg-zinc-900/30 relative">
+    <section
+      id="projects"
+      className="py-24 relative"
+      style={{ backgroundColor: C.sectionBg }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* header */}
+        {/* heading */}
         <div className="flex items-center gap-4 mb-16">
-          <h2 className="text-3xl font-jetbrains font-bold text-white">Featured Projects</h2>
-          <div className="h-px bg-zinc-700 flex-grow max-w-xs ml-4" />
+          <h2 className="text-3xl font-bold" style={{ color: C.white }}>
+            Featured Projects
+          </h2>
+          <div
+            className="h-px flex-grow max-w-xs ml-4"
+            style={{ backgroundColor: C.border }}
+          />
         </div>
 
-        {/* featured list */}
+        {/* list */}
         <div className="space-y-24">
           {projects.map((project, idx) => (
             <FeaturedProjectCard key={project.title} project={project} index={idx} />
