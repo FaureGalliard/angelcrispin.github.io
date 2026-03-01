@@ -130,7 +130,7 @@ export default function AboutMe() {
             {/* Heading */}
             <div className="flex items-center gap-4 mb-6">
               <h2 className="font-jetbrains text-3xl font-bold text-white">
-                About Me
+                Sobre Mi
               </h2>
               <div
                 className="h-[1px] flex-grow ml-4"
