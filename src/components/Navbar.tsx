@@ -65,10 +65,10 @@ export default function Navbar() {
               />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-white font-medium font-mono text-sm tracking-tight">
+              <span className="text-white font-medium font-jetbrains text-sm tracking-tight">
                 Angel Crispin
               </span>
-              <span className="text-[#4a6ef5] font-mono text-[11px] tracking-wide">
+              <span className="text-[#4a6ef5] font-jetbrains text-[11px] tracking-wide">
                 Software Engineer
               </span>
             </div>
@@ -79,7 +79,7 @@ export default function Navbar() {
             variants={navbarContainer}
             initial="hidden"
             animate="show"
-            className="hidden md:flex items-center space-x-6 ml-auto"
+            className="font-firacode hidden md:flex items-center space-x-6 ml-auto"
           >
             {navLinks.map((item) => (
               <motion.a
@@ -161,8 +161,8 @@ export default function Navbar() {
                 />
               </div>
               <div className="flex flex-col leading-tight">
-                <span className="text-white font-medium text-sm font-mono">Angel Crispin</span>
-                <span className="text-[#4a6ef5] font-mono text-[10px]">Software Engineer</span>
+                <span className="font-jetbrains text-white font-medium text-sm">Angel Crispin</span>
+                <span className="text-[#4a6ef5] font-jetbrains text-[10px]">Software Engineer</span>
               </div>
             </div>
 

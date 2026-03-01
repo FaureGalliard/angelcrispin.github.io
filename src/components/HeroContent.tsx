@@ -50,7 +50,7 @@ export default function HeroContent() {
 
           <motion.h1
             variants={heroItem}
-            className="text-[2.6rem] font-bold text-white text-left"
+            className="font-jetbrains text-[2.6rem] font-bold text-white text-left"
           >
             Angel Crispin
           </motion.h1>
@@ -59,14 +59,14 @@ export default function HeroContent() {
             variants={heroItem}
             className="text-[1rem] text-left font-bold"
           >
-            <span className="text-[rgba(66,96,197,1)]">
+            <span className="font-jetbrains text-[#4260c5]">
               Software Developer &lt; / &gt;
               </span>
           </motion.h2>
 
           <motion.p
             variants={heroItem}
-            className="mt-4 max-w-xl text-left text-sm leading-relaxed text-gray-300"
+            className="font-firacode mt-4 max-w-xl text-left text-sm leading-relaxed text-gray-300"
           >
            Desarrollo sistemas y aplicaciones con enfoque en lógica, arquitectura y eficiencia.
           </motion.p>

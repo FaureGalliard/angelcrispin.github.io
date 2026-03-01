@@ -116,18 +116,18 @@ const FeaturedProjectCard: React.FC<FeaturedProjectCardProps> = ({ project, inde
 
   const infoBlock = (
     <div className={`lg:col-span-5 flex flex-col z-20 ${reversed ? 'lg:items-start order-2 lg:order-1' : 'lg:text-right lg:items-end'}`}>
-      <p className="font-mono text-sm mb-2" style={{ color: PRIMARY }}>Featured Project</p>
-      <h3 className="text-2xl font-bold text-white mb-4 transition-colors cursor-pointer hover:opacity-80">
+      <p className="font-jetbrains text-sm mb-2" style={{ color: PRIMARY }}>Featured Project</p>
+      <h3 className="text-2xl font-jetbrains font-bold text-white mb-4 transition-colors cursor-pointer hover:opacity-80">
         {project.title}
       </h3>
 
       {/* floating description card */}
-      <div className={`bg-zinc-800 p-6 rounded-lg shadow-xl border border-zinc-700 mb-4 text-zinc-400 text-sm leading-relaxed backdrop-blur-sm relative z-20 ${reversed ? 'lg:-mr-16' : 'lg:-ml-16'}`}>
+      <div className={`bg-[#1a1a1a] font-firacode p-6 rounded-lg shadow-xl border border-zinc-700 mb-4 text-zinc-400 text-sm leading-relaxed backdrop-blur-sm relative z-20 ${reversed ? 'lg:-mr-16' : 'lg:-ml-16'}`}>
         {project.description}
       </div>
 
       {/* tech stack */}
-      <ul className={`flex flex-wrap gap-4 text-xs font-mono text-zinc-400 mb-6 ${reversed ? '' : 'lg:justify-end'}`}>
+      <ul className={`font-firacode flex flex-wrap gap-4 text-xs  text-zinc-400 mb-6 ${reversed ? '' : 'lg:justify-end'}`}>
         {project.tech.map((t) => <li key={t}>{t}</li>)}
       </ul>
 
@@ -158,7 +158,7 @@ const Projects: React.FC = () => {
 
         {/* header */}
         <div className="flex items-center gap-4 mb-16">
-          <h2 className="text-3xl font-bold text-white">Featured Projects</h2>
+          <h2 className="text-3xl font-jetbrains font-bold text-white">Featured Projects</h2>
           <div className="h-px bg-zinc-700 flex-grow max-w-xs ml-4" />
         </div>
 
