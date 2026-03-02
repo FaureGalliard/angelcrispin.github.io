@@ -83,14 +83,7 @@ export default function AboutMe() {
             </div>
 
             {/* Decorative corners */}
-            <div
-              className="absolute -top-4 -left-4 w-24 h-24 border-t-2 border-l-2 rounded-tl-lg pointer-events-none"
-              style={{ borderColor: "rgba(77, 159, 255, 0.5)" }}
-            />
-            <div
-              className="absolute -bottom-4 -right-4 w-24 h-24 border-b-2 border-r-2 rounded-br-lg pointer-events-none"
-              style={{ borderColor: "rgba(77, 253, 180, 0.5)" }}
-            />
+            
 
             {/* 5+ Years Experience badge */}
             <div

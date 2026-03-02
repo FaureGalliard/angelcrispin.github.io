@@ -7,9 +7,10 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <TechStack />
       <About />
       <Projects />
-      <TechStack />
+      
       
     </>
   );

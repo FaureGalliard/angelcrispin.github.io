@@ -4,7 +4,6 @@ import { Inter,Fira_Code, JetBrains_Mono } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-
 const firaCode = Fira_Code({
   subsets: ['latin'],
   variable: '--font-fira-code',
@@ -55,7 +54,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
         />
-        <Navbar />
+        
         <main className="min-h-[calc(100vh-8rem)] flex flex-col"> {}
           {children}
         </main>

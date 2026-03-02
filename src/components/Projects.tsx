@@ -163,13 +163,13 @@ const FeaturedProjectCard: React.FC<FeaturedProjectCardProps> = ({ project, inde
       }`}
     >
       {/* label */}
-      <p className="font-mono text-sm mb-2" style={{ color: C.primary }}>
+      <p className="font-jetbrains text-sm mb-2" style={{ color: C.primary }}>
         Featured Project
       </p>
 
       {/* title */}
       <h3
-        className="text-2xl font-bold mb-4 cursor-pointer transition-opacity hover:opacity-75"
+        className="font-jetbrains text-2xl font-bold mb-4 cursor-pointer transition-opacity hover:opacity-75"
         style={{ color: C.white }}
       >
         {project.title}
@@ -177,7 +177,7 @@ const FeaturedProjectCard: React.FC<FeaturedProjectCardProps> = ({ project, inde
 
       {/* floating description card */}
       <div
-        className={`p-6 rounded-lg shadow-xl border mb-4 text-sm leading-relaxed backdrop-blur-sm relative z-20 font-mono ${
+        className={` p-6 rounded-lg shadow-xl border mb-4 text-sm leading-relaxed backdrop-blur-sm relative z-20 font-firacode ${
           reversed ? 'lg:-mr-16' : 'lg:-ml-16'
         }`}
         style={{
@@ -191,7 +191,7 @@ const FeaturedProjectCard: React.FC<FeaturedProjectCardProps> = ({ project, inde
 
       {/* tech stack */}
       <ul
-        className={`flex flex-wrap gap-4 text-xs font-mono mb-6 ${
+        className={`flex flex-wrap gap-4 text-xs font-firacode mb-6 ${
           reversed ? '' : 'lg:justify-end'
         }`}
         style={{ color: C.muted }}
@@ -259,7 +259,7 @@ const Projects: React.FC = () => {
 
         {/* heading */}
         <div className="flex items-center gap-4 mb-16">
-          <h2 className="text-3xl font-bold" style={{ color: C.white }}>
+          <h2 className="font-jetbrains text-3xl font-bold" style={{ color: C.white }}>
             Featured Projects
           </h2>
           <div

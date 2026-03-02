@@ -1,143 +1,147 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { easeOut } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.06,
-    },
-  },
-};
+const allTech = [
+  { name: "Python", icon: "devicon-python-plain colored" },
+  { name: "C++", icon: "devicon-cplusplus-plain colored" },
+  { name: "TypeScript", icon: "devicon-typescript-plain colored" },
+  { name: "Java", icon: "devicon-java-plain colored" },
+  { name: "Django", icon: "devicon-django-plain colored" },
+  { name: "Flask", icon: "devicon-flask-original colored" },
+  { name: "Node.js", icon: "devicon-nodejs-plain colored" },
+  { name: "FastAPI", icon: "devicon-fastapi-plain colored" },
+  { name: "Supabase", icon: "devicon-supabase-plain colored" },
+  { name: "PostgreSQL", icon: "devicon-postgresql-plain colored" },
+  { name: "MySQL", icon: "devicon-mysql-plain colored" },
+  { name: "MongoDB", icon: "devicon-mongodb-plain colored" },
+  { name: "Git", icon: "devicon-git-plain colored" },
+  { name: "Docker", icon: "devicon-docker-plain colored" },
+  { name: "GitHub Actions", icon: "devicon-githubactions-plain colored" },
+  { name: "Vercel", icon: "devicon-vercel-plain" },
+  { name: "Cloudflare", icon: "devicon-cloudflare-plain colored" },
+  { name: "Next.js", icon: "devicon-nextjs-plain colored" },
+  { name: "Tailwind CSS", icon: "devicon-tailwindcss-plain colored" },
+];
 
-
-const itemVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 0.25,
-      ease: easeOut,
-    },
-  },
-};
-
-const Section = ({
-  title,
-  items,
-}: {
-  title: string;
-  items: { name: string; icon: string }[];
-}) => (
-  <div className="flex flex-col gap-4">
-    <h3 className="text-white text-center">{title}</h3>
-
-    <div
-      className="rounded-2xl border p-6 backdrop-blur-md bg-[rgba(13,14,15,0.9)]"
-      style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-    >
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-8"
-      >
-        {items.map((item) => (
-          <motion.div
-            key={item.name}
-            variants={itemVariants}
-            className="
-              flex flex-col items-center justify-center
-              h-16 gap
-              rounded-lg
-              transition-all duration-300 ease-in-out
-              group
-              hover:scale-105
-              hover:rotate-3
-            "
-            style={{
-              borderColor: 'rgba(255, 255, 255, 0.1)',
-            }}
-          >
-            <i
-              className={`
-                ${item.icon} colored
-                text-3xl
-                filter-grayscale
-                group-hover:filter-none
-                group-hover:scale-110
-                group-hover:rotate-6
-                transition-all duration-300 ease-in-out
-              `}
-            />
-            <span className="mt-2 text-xs text-gray-400 group-hover:text-white transition-colors duration-300">
-              {item.name}
-            </span>
-          </motion.div>
-        ))}
-      </motion.div>
-    </div>
-  </div>
-);
+const track = [...allTech, ...allTech, ...allTech];
 
 export default function TechStack() {
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: '-80px' });
+
   return (
-    <section id="techstack" className="py-20 bg-[rgba(16,17,17,1)]">
-      <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-2xl font-semibold text-white mb-10">Tech Stack</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Section
-            title="Languages"
-            items={[
-              { name: "Python", icon: "devicon-python-plain colored" },
-              { name: "C++", icon: "devicon-cplusplus-plain colored" },
-              { name: "TypeScript", icon: "devicon-typescript-plain colored" },
-              { name: "Java", icon: "devicon-java-plain colored" },
-            ]}
-          />
-          <Section
-            title="Backend & Systems"
-            items={[
-              { name: "Django", icon: "devicon-django-plain" },
-              { name: "Flask", icon: "devicon-flask-original" },
-              { name: "Node.js", icon: "devicon-nodejs-plain colored" },
-              { name: "REST APIs", icon: "devicon-fastapi-plain colored" },
-              { name: "Supabase", icon: "devicon-supabase-plain colored" },
-            ]}
-          />
-          <Section
-            title="Databases"
-            items={[
-              { name: "PostgreSQL", icon: "devicon-postgresql-plain colored" },
-              { name: "MySQL", icon: "devicon-mysql-plain colored" },
-              { name: "MongoDB", icon: "devicon-mongodb-plain colored" },
-            ]}
-          />
-          <Section
-            title="DevOps"
-            items={[
-              { name: "Git", icon: "devicon-git-plain colored" },
-              { name: "Docker", icon: "devicon-docker-plain colored" },
-              { name: "CI/CD", icon: "devicon-githubactions-plain colored" },
-              { name: "Vercel", icon: "devicon-vercel-plain" },
-              { name: "Cloudflare", icon: "devicon-cloudflare-plain colored" },
-            ]}
-          />
-          <Section
-            title="Frontend"
-            items={[
-              { name: "Next.js", icon: "devicon-nextjs-plain colored" },
-              {
-                name: "Tailwind CSS",
-                icon: "devicon-tailwindcss-plain colored",
-              },
-            ]}
-          />
+    <>
+      <style>{`
+        @keyframes carousel {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-33.333%); }
+        }
+        .carousel-track {
+          animation: carousel 35s linear infinite;
+        }
+        .carousel-mask:hover .carousel-track {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      <section
+        id="techstack"
+        ref={sectionRef}
+        className="bg-[rgba(16,17,17,1)] relative overflow-hidden py-24"
+      >
+        {/* Subtle grid */}
+        
+
+        <div className="relative max-w-5xl mx-auto px-6">
+
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-14"
+          >
+            <motion.h2
+              initial={{ opacity: 0, y: 16 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="font-jetbrains font-bold text-white text-3xl md:text-4xl tracking-tight"
+            >
+              Technologies I work with
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : {}}
+              transition={{ duration: 0.6, delay: 0.22 }}
+              className="font-jetbrains text-sm text-white/40 mt-2 tracking-wide"
+            >
+              Modern tools for modern solutions
+            </motion.p>
+
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={isInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.7, delay: 0.4 }}
+              className="mt-4 h-px w-16 bg-gradient-to-r from-white/30 to-transparent origin-left"
+            />
+          </motion.div>
+
+          {/* Carousel wrapper — padding vertical para que el hover no se corte */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div
+              className="carousel-mask relative py-3"
+              style={{
+                maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Extra vertical space so scale-110 on hover isn't clipped */}
+              <div className="py-2 overflow-visible">
+                <div className="carousel-track flex gap-4 w-max">
+                  {track.map((item, i) => (
+                    <div
+                      key={`${item.name}-${i}`}
+                      className="
+                        group flex-shrink-0
+                        flex flex-col items-center justify-center gap-3
+                        px-5 py-4 rounded-xl
+                       
+                        bg-white/[0.03]
+                        backdrop-blur-sm
+                        cursor-default
+                        transition-all duration-300 ease-out
+                        hover:border-white/[0.15]
+                        hover:bg-white/[0.07]
+                        hover:scale-110
+                        hover:-translate-y-1
+                        hover:z-10
+                        relative
+                        min-w-[100px]
+                      "
+                    >
+                      <i
+                        className={`${item.icon} text-[2rem] transition-transform duration-300 group-hover:scale-110`}
+                      />
+                      <span className="font-firacode text-[0.65rem] text-white/40 group-hover:text-white/80 transition-colors duration-300 whitespace-nowrap">
+                        {item.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
