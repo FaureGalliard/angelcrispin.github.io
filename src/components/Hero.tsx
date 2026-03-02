@@ -11,13 +11,18 @@ function GridBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0.5, y: 0.5 });
   const targetMouseRef = useRef({ x: 0.5, y: 0.5 });
+  const prevMouseRef = useRef({ x: 0.5, y: 0.5 });
   const influenceRef = useRef(0);
   const rafRef = useRef<number>(0);
+  const lastRippleRef = useRef(0);
+  const rippleTimeRef = useRef(-999);
+  const ripplePosRef = useRef({ x: 0.5, y: 0.5 });
+
+  const RIPPLE_INTERVAL = 0.35; // segundos entre cada ripple
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const gl = canvas.getContext("webgl");
     if (!gl) return;
 
@@ -34,57 +39,80 @@ function GridBackground() {
     `;
 
     const frag = `
-  precision highp float;
-  uniform float iTime;
-  uniform vec2 iResolution;
-  uniform vec2 mousePosition;
-  uniform float mouseInfluence;
-  uniform float mouseRadius;
-  varying vec2 vUv;
+      precision highp float;
+      uniform float iTime;
+      uniform vec2  iResolution;
+      uniform vec2  mousePosition;
+      uniform float mouseInfluence;
+      uniform float mouseRadius;
+      uniform float mouseSpeed;
+      uniform float rippleStart;
+      uniform vec2  rippleOrigin;
+      varying vec2  vUv;
 
-  void main() {
-    vec2 px = vUv * iResolution;
-    float cellSize = 25.0;
+      void main() {
+        vec2  px       = vUv * iResolution;
+        float cellSize = 25.0;
 
-    vec2 mousePx = mousePosition * iResolution;
-    float mouseDist = length(px - mousePx);
-    float radius = mouseRadius * iResolution.y;
-    float hover = mouseInfluence * exp(-mouseDist * mouseDist / (radius * radius));
+        // ── Hover ──────────────────────────────────────────
+        vec2  mousePx   = mousePosition * iResolution;
+        float mouseDist = length(px - mousePx);
+        float radius    = mouseRadius * iResolution.y;
+        float hover     = mouseInfluence * exp(-mouseDist * mouseDist / (radius * radius));
 
-    vec2 cell = fract(px / cellSize);
-    float dx = min(cell.x, 1.0 - cell.x) * cellSize;
-    float dy = min(cell.y, 1.0 - cell.y) * cellSize;
+        // ── Ripple ─────────────────────────────────────────
+        float rippleDuration = 4.0;   // duración total de la onda (segundos)
+        float rippleSpeed    = 220.0; // velocidad de expansión (px/s)
 
-    // Línea base de 1px dura, como el CSS original
-    float aa = 1.0;
-    float baseW = 0.1;
-    float glowW = baseW + hover/3.0;
+        float age        = iTime - rippleStart;
+        float rippleAlive = step(0.0, age) * step(age, rippleDuration);
 
-    float lineX = 1.0 - smoothstep(baseW - aa, baseW + aa, dx);
-    float lineY = 1.0 - smoothstep(baseW - aa, baseW + aa, dy);
-    float grid = max(lineX, lineY);
+        vec2  originPx   = rippleOrigin * iResolution;
+        float originDist = length(px - originPx);
+        float rippleAge  = age * rippleSpeed;
+        float rippleRing = exp(-pow(originDist - rippleAge, 2.0) / (radius * 0.08));
+        float rippleFade = 1.0 - smoothstep(rippleDuration * 0.5, rippleDuration, age);
+        float ripple     = rippleRing * mouseInfluence * rippleFade * rippleAlive;
 
-    // Glow extra: halo más ancho solo al hover
-    float glowX = 1.0 - smoothstep(glowW - aa, glowW + aa * 2.0, dx);
-    float glowY = 1.0 - smoothstep(glowW - aa, glowW + aa * 2.0, dy);
-    float glowGrid = max(glowX, glowY);
+        // ── Total ──────────────────────────────────────────
+        float totalHover = clamp(hover + ripple * 0.6, 0.0, 1.0);
 
-    vec3 baseColor = vec3(0.396, 0.420, 0.420);
-    vec3 glowColor = vec3(0.929, 0.945, 0.996); // #EDF1FE
+        // ── Grid ───────────────────────────────────────────
+        vec2  cell = fract(px / cellSize);
+        float dx   = min(cell.x, 1.0 - cell.x) * cellSize;
+        float dy   = min(cell.y, 1.0 - cell.y) * cellSize;
 
-    // Color y alpha: línea base siempre visible, glow encima al hover
-    vec3 finalColor = mix(baseColor, glowColor, hover * 0.9);
-    float baseAlpha = 0.65;
-    float finalAlpha = baseAlpha + hover * 0.5;
+        float aa    = 1.0;
+        float baseW = 0.1;
+        float glowW = baseW + totalHover / 3.0;
 
-    float lineContrib = grid * finalAlpha;
-    float glowContrib = glowGrid * hover * 0.4;
+        float lineX = 1.0 - smoothstep(baseW - aa, baseW + aa, dx);
+        float lineY = 1.0 - smoothstep(baseW - aa, baseW + aa, dy);
+        float grid  = max(lineX, lineY);
 
-    gl_FragColor = vec4(finalColor, lineContrib + glowContrib);
-  }
-`;
+        float glowX    = 1.0 - smoothstep(glowW - aa, glowW + aa * 2.0, dx);
+        float glowY    = 1.0 - smoothstep(glowW - aa, glowW + aa * 2.0, dy);
+        float glowGrid = max(glowX, glowY);
 
-    // Compilar shaders
+        // ── Color ──────────────────────────────────────────
+        vec3 baseColor   = vec3(0.396, 0.420, 0.420);
+        vec3 glowColor   = vec3(0.929, 0.945, 0.996); // #EDF1FE
+        vec3 rippleColor = vec3(0.4,   0.55,  1.0);   // azul eléctrico
+
+        vec3 finalColor = mix(baseColor, glowColor, hover * 0.9);
+        finalColor      = mix(finalColor, rippleColor, ripple * 0.7);
+
+        // ── Alpha ──────────────────────────────────────────
+        float baseAlpha  = 0.65;
+        float finalAlpha = baseAlpha + totalHover * 0.5;
+
+        float lineContrib = grid     * finalAlpha;
+        float glowContrib = glowGrid * totalHover * 0.4;
+
+        gl_FragColor = vec4(finalColor, lineContrib + glowContrib);
+      }
+    `;
+
     const compileShader = (type: number, src: string) => {
       const s = gl.createShader(type)!;
       gl.shaderSource(s, src);
@@ -98,7 +126,6 @@ function GridBackground() {
     gl.linkProgram(program);
     gl.useProgram(program);
 
-    // Quad fullscreen
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -106,16 +133,20 @@ function GridBackground() {
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-    // Uniforms
-    const uTime = gl.getUniformLocation(program, "iTime");
-    const uRes = gl.getUniformLocation(program, "iResolution");
-    const uMouse = gl.getUniformLocation(program, "mousePosition");
-    const uInfluence = gl.getUniformLocation(program, "mouseInfluence");
-    const uRadius = gl.getUniformLocation(program, "mouseRadius");
+    const uTime        = gl.getUniformLocation(program, "iTime");
+    const uRes         = gl.getUniformLocation(program, "iResolution");
+    const uMouse       = gl.getUniformLocation(program, "mousePosition");
+    const uInfluence   = gl.getUniformLocation(program, "mouseInfluence");
+    const uRadius      = gl.getUniformLocation(program, "mouseRadius");
+    const uSpeed       = gl.getUniformLocation(program, "mouseSpeed");
+    const uRippleStart = gl.getUniformLocation(program, "rippleStart");
+    const uRippleOrigin= gl.getUniformLocation(program, "rippleOrigin");
 
     gl.uniform1f(uRadius, 0.25);
+    gl.uniform1f(uSpeed, 0);
+    gl.uniform1f(uRippleStart, -999.0);
+    gl.uniform2f(uRippleOrigin, 0.5, 0.5);
 
-    // Resize
     const resize = () => {
       const w = canvas.clientWidth * window.devicePixelRatio;
       const h = canvas.clientHeight * window.devicePixelRatio;
@@ -127,7 +158,6 @@ function GridBackground() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Mouse
     const section = canvas.parentElement!;
     const onMove = (e: MouseEvent) => {
       const rect = section.getBoundingClientRect();
@@ -141,16 +171,31 @@ function GridBackground() {
     section.addEventListener("mousemove", onMove);
     section.addEventListener("mouseleave", onLeave);
 
-    // Render loop
     const render = (t: number) => {
-      gl.uniform1f(uTime, t * 0.001);
+      const t_sec = t * 0.001;
+      gl.uniform1f(uTime, t_sec);
 
       const lerp = 0.12;
       mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * lerp;
       mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * lerp;
 
-      const prog = gl.getUniform(program, uInfluence!) as number;
-      const newInf = prog + (influenceRef.current - prog) * 0.06;
+      const sdx   = mouseRef.current.x - prevMouseRef.current.x;
+      const sdy   = mouseRef.current.y - prevMouseRef.current.y;
+      const speed = Math.sqrt(sdx * sdx + sdy * sdy) * 100;
+      gl.uniform1f(uSpeed, speed);
+      prevMouseRef.current = { ...mouseRef.current };
+
+      // Dispara ripple cada RIPPLE_INTERVAL segundos si hay movimiento
+      if (speed > 0.1 && t_sec - lastRippleRef.current > RIPPLE_INTERVAL) {
+        lastRippleRef.current   = t_sec;
+        rippleTimeRef.current   = t_sec;
+        ripplePosRef.current    = { ...mouseRef.current };
+        gl.uniform1f(uRippleStart, t_sec);
+        gl.uniform2f(uRippleOrigin, mouseRef.current.x, mouseRef.current.y);
+      }
+
+      const currentInf = gl.getUniform(program, uInfluence!) as number;
+      const newInf     = currentInf + (influenceRef.current - currentInf) * 0.06;
       gl.uniform1f(uInfluence, newInf);
       gl.uniform2f(uMouse, mouseRef.current.x, mouseRef.current.y);
 
@@ -172,19 +217,18 @@ function GridBackground() {
   }, []);
 
   return (
-  <>
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-       style={{
-      WebkitMaskImage: "linear-gradient(to bottom, black 80%, transparent 100%)",
-      maskImage: "linear-gradient(to bottom, black 65%, transparent 100%)",
-    }}
-      aria-hidden
-    />
-    
-  </>
-);
+    <>
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{
+          WebkitMaskImage: "linear-gradient(to bottom, black 80%, transparent 100%)",
+          maskImage: "linear-gradient(to bottom, black 65%, transparent 100%)",
+        }}
+        aria-hidden
+      />
+    </>
+  );
 }
 
 // ── HeroContent ────────────────────────────────────────────────────────────────

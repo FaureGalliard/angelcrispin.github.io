@@ -53,7 +53,7 @@ export default function Navbar() {
           {/* Logo — avatar + name + title */}
           <Link
             href="/"
-            className="flex-shrink-0 flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer"
+            className="shrink-0 flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer"
           >
             <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0">
               <Image
