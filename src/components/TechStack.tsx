@@ -54,7 +54,7 @@ export default function TechStack() {
         {/* Subtle grid */}
         
 
-        <div className="relative max-w-5xl mx-auto px-6">
+       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Header */}
           <motion.div
@@ -67,7 +67,7 @@ export default function TechStack() {
               initial={{ opacity: 0, y: 16 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="font-jetbrains font-bold text-white text-3xl md:text-4xl tracking-tight"
+              className="text-center font-jetbrains font-bold text-white text-3xl md:text-4xl tracking-tight"
             >
               Technologies I work with
             </motion.h2>
@@ -76,17 +76,12 @@ export default function TechStack() {
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ duration: 0.6, delay: 0.22 }}
-              className="font-jetbrains text-sm text-white/40 mt-2 tracking-wide"
+              className="text-center font-jetbrains text-sm text-white/40 mt-2 tracking-wide"
             >
               Modern tools for modern solutions
             </motion.p>
 
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={isInView ? { scaleX: 1 } : {}}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="mt-4 h-px w-16 bg-gradient-to-r from-white/30 to-transparent origin-left"
-            />
+           
           </motion.div>
 
           {/* Carousel wrapper — padding vertical para que el hover no se corte */}
@@ -110,21 +105,21 @@ export default function TechStack() {
                     <div
                       key={`${item.name}-${i}`}
                       className="
-                        group flex-shrink-0
+                        group shrink-0
                         flex flex-col items-center justify-center gap-3
                         px-5 py-4 rounded-xl
                        
-                        bg-white/[0.03]
+                        bg-white/0.03
                         backdrop-blur-sm
                         cursor-default
                         transition-all duration-300 ease-out
-                        hover:border-white/[0.15]
+                        hover:border-white/0.15
                         hover:bg-white/[0.07]
                         hover:scale-110
                         hover:-translate-y-1
                         hover:z-10
                         relative
-                        min-w-[100px]
+                        min-w-25
                       "
                     >
                       <i
