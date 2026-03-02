@@ -6,7 +6,7 @@ import Image from "next/image";
 // muted:     #6b7280
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
+interface WindowControlsProps {}  // ← esto falta
 // ─── Window Controls ──────────────────────────────────────────────────────────
 const WindowControls: React.FC<WindowControlsProps> = () => (
   <div className="flex gap-2">
