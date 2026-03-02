@@ -33,7 +33,7 @@ function GridBackground() {
       }
     `;
 
-   const frag = `
+    const frag = `
   precision highp float;
   uniform float iTime;
   uniform vec2 iResolution;
@@ -48,33 +48,39 @@ function GridBackground() {
 
     vec2 mousePx = mousePosition * iResolution;
     float mouseDist = length(px - mousePx);
-
     float radius = mouseRadius * iResolution.y;
     float hover = mouseInfluence * exp(-mouseDist * mouseDist / (radius * radius));
-
-    // Base visible (1px) + engrosamiento al hover (hasta +3px)
-    float baseThickness = 0.3;
-    float thickened = baseThickness + hover ;
 
     vec2 cell = fract(px / cellSize);
     float dx = min(cell.x, 1.0 - cell.x) * cellSize;
     float dy = min(cell.y, 1.0 - cell.y) * cellSize;
-    float lineX = smoothstep(thickened + 0.5, thickened - 0.5, dx);
-    float lineY = smoothstep(thickened + 0.5, thickened - 0.5, dy);
+
+    // Línea base de 1px dura, como el CSS original
+    float aa = 1.0;
+    float baseW = 0.1;
+    float glowW = baseW + hover/3.0;
+
+    float lineX = 1.0 - smoothstep(baseW - aa, baseW + aa, dx);
+    float lineY = 1.0 - smoothstep(baseW - aa, baseW + aa, dy);
     float grid = max(lineX, lineY);
 
-    vec3 baseColor = vec3(0.294, 0.306, 0.306);
-    float baseAlpha = 0.35;
+    // Glow extra: halo más ancho solo al hover
+    float glowX = 1.0 - smoothstep(glowW - aa, glowW + aa * 2.0, dx);
+    float glowY = 1.0 - smoothstep(glowW - aa, glowW + aa * 2.0, dy);
+    float glowGrid = max(glowX, glowY);
 
-    vec3 glowColor = vec3(0.263, 0.376, 0.773);
-    float glowStrength = hover * 0.85;
+    vec3 baseColor = vec3(0.396, 0.420, 0.420);
+    vec3 glowColor = vec3(0.929, 0.945, 0.996); // #EDF1FE
 
-    vec3 finalColor = mix(baseColor, glowColor, glowStrength);
+    // Color y alpha: línea base siempre visible, glow encima al hover
+    vec3 finalColor = mix(baseColor, glowColor, hover * 0.9);
+    float baseAlpha = 0.65;
     float finalAlpha = baseAlpha + hover * 0.5;
 
-    float fadeY = 1.0 - smoothstep(0.55, 1.0, vUv.y);
+    float lineContrib = grid * finalAlpha;
+    float glowContrib = glowGrid * hover * 0.4;
 
-    gl_FragColor = vec4(finalColor, grid * finalAlpha * fadeY);
+    gl_FragColor = vec4(finalColor, lineContrib + glowContrib);
   }
 `;
 
