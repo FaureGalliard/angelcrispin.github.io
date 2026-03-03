@@ -1,6 +1,7 @@
 'use client';
 import { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
+
 const allTech = [
   { name: "Python",         icon: "devicon-python-plain colored" },
   { name: "C++",            icon: "devicon-cplusplus-plain colored" },
@@ -22,278 +23,375 @@ const allTech = [
   { name: "Next.js",        icon: "devicon-nextjs-plain colored" },
   { name: "Tailwind CSS",   icon: "devicon-tailwindcss-plain colored" },
 ];
+
 const track = [...allTech, ...allTech, ...allTech];
-// ── Animated background canvas ────────────────────────────────────────────────
-function LiveBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+const CARD_W    = 120 + 6;
+const LOOP_W    = CARD_W * allTech.length - 6;
+const SCROLL_VH = 200;
+
+// ── Title shine hook (same logic as Hero) ─────────────────────────────────────
+function useTitleShine(triggerRef: React.RefObject<HTMLElement>) {
+  const h2Ref   = useRef<HTMLHeadingElement>(null);
+  const rafRef  = useRef<number>(0);
+  const shineX  = useRef(-20);
+  const running = useRef(false);
+  const done    = useRef(false);
+
+  const setGradient = (x: number, o: number) => {
+    if (!h2Ref.current) return;
+    h2Ref.current.style.backgroundImage = `linear-gradient(
+      105deg,
+      white                        0%,
+      white                        ${x - 20}%,
+      rgba(237,241,254,${o})       ${x - 8}%,
+      rgba(255,255,255,${o})       ${x}%,
+      rgba(180,200,255,${o * 0.9}) ${x + 5}%,
+      white                        ${x + 16}%,
+      white                        100%
+    )`;
+  };
+
+  const clearGradient = () => {
+    if (h2Ref.current)
+      h2Ref.current.style.backgroundImage = 'linear-gradient(105deg, white 0%, white 100%)';
+  };
+
+  const introOpacity = (x: number) => {
+    if (x < 10)  return x / 10;
+    if (x < 85)  return 1;
+    return 1 - (x - 85) / 35;
+  };
+
+  const sweep = () => {
+    shineX.current = Math.min(shineX.current + 1.4, 120);
+    const o = Math.max(0, introOpacity(shineX.current));
+    setGradient(shineX.current, o);
+    if (shineX.current >= 120) {
+      running.current = false;
+      done.current    = true;
+      clearGradient();
+      return;
+    }
+    rafRef.current = requestAnimationFrame(sweep);
+  };
+
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
-    let raf = 0;
-    const resize = () => {
-      canvas.width  = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-    const orbs = Array.from({ length: 5 }, (_, i) => ({
-      x:    Math.random() * canvas.width,
-      y:    Math.random() * canvas.height,
-      r:    180 + Math.random() * 220,
-      vx:   (Math.random() - 0.5) * 0.18,
-      vy:   (Math.random() - 0.5) * 0.18,
-      hue:  [210, 225, 195, 240, 200][i],
-      sat:  30 + Math.random() * 20,
-      phase: Math.random() * Math.PI * 2,
-    }));
-    const particles = Array.from({ length: 38 }, () => ({
-      x:     Math.random() * 1000,
-      y:     Math.random() * 400,
-      size:  0.6 + Math.random() * 1.2,
-      speed: 0.08 + Math.random() * 0.18,
-      drift: (Math.random() - 0.5) * 0.06,
-      alpha: 0.15 + Math.random() * 0.35,
-    }));
-    let t = 0;
-    const draw = () => {
-      t += 0.004;
-      const W = canvas.width;
-      const H = canvas.height;
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = 'rgba(16,17,17,1)';
-      ctx.fillRect(0, 0, W, H);
-      orbs.forEach(o => {
-        o.x += o.vx;
-        o.y += o.vy;
-        if (o.x < -o.r) o.x = W + o.r;
-        if (o.x > W + o.r) o.x = -o.r;
-        if (o.y < -o.r) o.y = H + o.r;
-        if (o.y > H + o.r) o.y = -o.r;
-        const pulse = 0.018 + 0.008 * Math.sin(t + o.phase);
-        const grad = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-        grad.addColorStop(0,   `hsla(${o.hue}, ${o.sat}%, 40%, ${pulse})`);
-        grad.addColorStop(0.5, `hsla(${o.hue}, ${o.sat}%, 30%, ${pulse * 0.5})`);
-        grad.addColorStop(1,   `hsla(${o.hue}, ${o.sat}%, 20%, 0)`);
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      const scanY = ((t * 60) % (H + 40)) - 20;
-      const scanGrad = ctx.createLinearGradient(0, scanY - 12, 0, scanY + 12);
-      scanGrad.addColorStop(0,   'rgba(100,130,255,0)');
-      scanGrad.addColorStop(0.5, 'rgba(100,130,255,0.025)');
-      scanGrad.addColorStop(1,   'rgba(100,130,255,0)');
-      ctx.fillStyle = scanGrad;
-      ctx.fillRect(0, scanY - 12, W, 24);
-      particles.forEach(p => {
-        p.x += p.speed;
-        p.y += p.drift;
-        if (p.x > W + 10) { p.x = -10; p.y = Math.random() * H; }
-        if (p.y < 0)  p.y = H;
-        if (p.y > H)  p.y = 0;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(180,200,255,${p.alpha})`;
-        ctx.fill();
-      });
-      ctx.strokeStyle = 'rgba(255,255,255,0.018)';
-      ctx.lineWidth = 1;
-      const lineSpacing = 40;
-      for (let y = 0; y < H; y += lineSpacing) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
-        ctx.stroke();
-      }
-      raf = requestAnimationFrame(draw);
-    };
-    raf = requestAnimationFrame(draw);
+    // Fire shine when section enters viewport
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !done.current && !running.current) {
+          running.current = true;
+          shineX.current  = -20;
+          rafRef.current  = requestAnimationFrame(sweep);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (triggerRef.current) observer.observe(triggerRef.current);
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('resize', resize);
+      observer.disconnect();
+      cancelAnimationFrame(rafRef.current);
     };
-  }, []);
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)',
-      }}
-    />
-  );
+  }, [triggerRef]);
+
+  return h2Ref;
 }
+
 // ── TechStack ─────────────────────────────────────────────────────────────────
 export default function TechStack() {
-  const sectionRef   = useRef<HTMLElement>(null);
-  const trackRef     = useRef<HTMLDivElement>(null);
-  const isInView     = useInView(sectionRef, { once: true, margin: '-80px' });
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const trackRef   = useRef<HTMLDivElement>(null);
+  const isInView   = useInView(wrapperRef, { once: true, margin: '-80px' });
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  // Scroll-driven carousel — pure JS offset, no CSS animation
+  const [progress, setProgress]         = useState(0);
+
+  // Center item detection
+  const [centerIndex, setCenterIndex] = useState<number | null>(null);
+
+  // Title shine
+  const h2Ref = useTitleShine(wrapperRef as React.RefObject<HTMLElement>);
+
+  // smooth eased offset
+  const easedOffsetRef  = useRef(0);
+  const targetOffsetRef = useRef(0);
+  const scrollVelRef    = useRef(0); // for micro vertical movement
+  const scrollStopTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isSnapping      = useRef(false);
+
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
+    const wrapper = wrapperRef.current;
+    const track   = trackRef.current;
+    if (!wrapper || !track) return;
+
     track.style.animation = 'none';
-    let offset    = 0;
-    let baseSpeed = 0.8;
-    let boost     = 0;
-    const DECAY   = 0.92;
-    const cardW   = 120 + 6;
-    const loopWidth = cardW * allTech.length - 6;
+
+    const easeInOutCubic = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    // Snap target: find nearest card center relative to viewport center
+    const getSnapTarget = () => {
+      const viewportCenterX = window.innerWidth / 2;
+      const trackRect = track.getBoundingClientRect();
+      const relativeCenter = viewportCenterX - trackRect.left;
+      // Which card index is closest to center
+      const nearestIdx = Math.round(relativeCenter / CARD_W);
+      // Offset needed so that card sits exactly at viewport center
+      // current offset + (relativeCenter - nearestIdx * CARD_W + CARD_W/2 - CARD_W/2)
+      const cardCenterInTrack = nearestIdx * CARD_W - CARD_W / 2 + CARD_W / 2;
+      const snapOffset = easedOffsetRef.current - (relativeCenter - nearestIdx * CARD_W);
+      return snapOffset;
+    };
+
     let lastScrollY = window.scrollY;
+
+    const onScroll = () => {
+      isSnapping.current = false; // interrupt any ongoing snap
+
+      const rect       = wrapper.getBoundingClientRect();
+      const wrapperH   = wrapper.offsetHeight;
+      const stickyH    = window.innerHeight;
+      const scrolled   = -rect.top;
+      const scrollable = wrapperH - stickyH;
+      const rawP = Math.min(1, Math.max(0, scrolled / scrollable));
+      setProgress(rawP);
+
+      const easedP = easeInOutCubic(rawP);
+      targetOffsetRef.current = easedP * LOOP_W;
+
+      const curY = window.scrollY;
+      scrollVelRef.current = curY - lastScrollY;
+      lastScrollY = curY;
+
+      // Debounce: detect scroll stop → trigger snap
+      if (scrollStopTimer.current) clearTimeout(scrollStopTimer.current);
+      scrollStopTimer.current = setTimeout(() => {
+        // Only snap if we're inside the sticky zone
+        const rect2 = wrapper.getBoundingClientRect();
+        const inZone = rect2.top <= 0 && rect2.bottom >= window.innerHeight;
+        if (!inZone) return;
+
+        isSnapping.current = true;
+        const snapTo = getSnapTarget();
+        targetOffsetRef.current = snapTo;
+      }, 120); // 120ms after last scroll event
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
     let raf = 0;
     const tick = () => {
-      const curY  = window.scrollY;
-      const delta = curY - lastScrollY;
-      lastScrollY = curY;
-      boost = boost * (DECAY / 2) + Math.abs(delta) * 0.15;
-      offset += baseSpeed + boost;
-      if (loopWidth > 0 && offset >= loopWidth) offset -= loopWidth;
-      if (track) track.style.transform = `translateX(-${offset.toFixed(2)}px)`;
+      const curr = easedOffsetRef.current;
+      const tgt  = targetOffsetRef.current;
+      const diff = tgt - curr;
+
+      // Tighter lerp when snapping for that magnetic feel
+      const lerpFactor = isSnapping.current ? 0.1 : 0.08;
+      easedOffsetRef.current += diff * lerpFactor;
+
+      scrollVelRef.current *= 0.85;
+
+      if (track) {
+        const microY = isSnapping.current ? 0 : -Math.abs(scrollVelRef.current) * 0.15;
+        track.style.transform = `translateX(-${easedOffsetRef.current.toFixed(2)}px) translateY(${microY.toFixed(2)}px)`;
+      }
+
+      // Center index detection
+      const viewportCenterX = window.innerWidth / 2;
+      const trackRect = track.getBoundingClientRect();
+      const relativeCenter = viewportCenterX - trackRect.left;
+      const idx = Math.round(relativeCenter / CARD_W);
+      setCenterIndex(idx);
+
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(raf);
+      if (scrollStopTimer.current) clearTimeout(scrollStopTimer.current);
+    };
   }, []);
+
   return (
     <>
       <style>{`
         .carousel-track { will-change: transform; }
       `}</style>
-      <section
+
+      <div
+        ref={wrapperRef}
+        style={{ height: `calc(100vh + ${SCROLL_VH}vh)` }}
+        className="relative"
         id="techstack"
-        ref={sectionRef}
-        className="relative overflow-hidden py-24"
-        style={{ backgroundColor: 'rgba(16,17,17,1)' }}
       >
-        <LiveBackground />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 32 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-14"
-          >
-            <motion.h2
-              initial={{ opacity: 0, y: 16 }}
+        <div
+          className="sticky top-0 w-full overflow-hidden"
+          style={{ height: '100vh', backgroundColor: 'rgba(16,17,17,1)' }}
+        >
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
+
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="text-center font-jetbrains font-bold text-white text-3xl md:text-4xl tracking-tight"
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className="mb-14"
             >
-              Technologies I work with
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              transition={{ duration: 0.6, delay: 0.22 }}
-              className="text-center font-jetbrains text-sm text-white/40 mt-2 tracking-wide"
-            >
-              Modern tools for modern solutions
-            </motion.p>
-          </motion.div>
-
-          {/* Carousel */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="relative">
-              {/* Left fade */}
-              <div
-                className="absolute left-0 top-0 h-full w-28 z-10 pointer-events-none"
+              {/* Shine title */}
+              <motion.h2
+                ref={h2Ref}
+                initial={{ opacity: 0, y: 16 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                className="text-center font-jetbrains font-bold text-3xl md:text-4xl tracking-tight"
                 style={{
-                  background: 'linear-gradient(to right, rgba(16,17,17,1) 0%, rgba(16,17,17,0.7) 50%, transparent 100%)',
-                  backdropFilter: 'blur(4px)',
-                  WebkitBackdropFilter: 'blur(4px)',
-                  maskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
-                  WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
+                  backgroundImage: 'linear-gradient(105deg, white 0%, white 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  color: 'transparent',
                 }}
-              />
-              {/* Right fade */}
-              <div
-                className="absolute right-0 top-0 h-full w-28 z-10 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(to left, rgba(16,17,17,1) 0%, rgba(16,17,17,0.7) 50%, transparent 100%)',
-                  backdropFilter: 'blur(4px)',
-                  WebkitBackdropFilter: 'blur(4px)',
-                  maskImage: 'linear-gradient(to left, black 0%, transparent 100%)',
-                  WebkitMaskImage: 'linear-gradient(to left, black 0%, transparent 100%)',
-                }}
-              />
-
-              {/* ── perspective wrapper ── */}
-              <div
-                className="overflow-hidden py-5"
-                style={{ perspective: '1200px' }}
               >
-                <div ref={trackRef} className="carousel-track flex gap-[6px] w-max">
-                  {track.map((item, i) => {
-                    const isHovered = hoveredIndex === i;
-                    const isDimmed  = hoveredIndex !== null && !isHovered;
-                    return (
-                      <div
-                        key={`${item.name}-${i}`}
-                        onMouseEnter={() => setHoveredIndex(i)}
-                        onMouseLeave={() => setHoveredIndex(null)}
-                        className="shrink-0 cursor-default"
-                        style={{
-                          transition: 'opacity 0.25s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-                          opacity:   isDimmed ? 0.25 : 1,
-                          transform: isHovered
-                            ? 'translateY(-8px) scale(1.04) rotateX(6deg)'
-                            : 'translateY(0) scale(1) rotateX(0deg)',
-                          zIndex:    isHovered ? 10 : 1,
-                          position:  'relative',
-                        }}
-                      >
-                        <div
-                          style={{
-                            width:  '120px',
-                            height: '120px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            backgroundColor: isHovered
-                              ? 'rgba(20,22,24,1)'
-                              : 'rgba(13,14,15,0.9)',
-                            border: isHovered
-                              ? '1px solid rgba(255,255,255,0.14)'
-                              : '1px solid rgba(255,255,255,0.06)',
-                            transition: 'background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease',
-                            boxShadow: isHovered
-                              ? '0 12px 32px rgba(0,0,0,0.6), 0 0 16px rgba(80,120,255,0.08)'
-                              : 'none',
-                          }}
-                        >
-                          <i className={`${item.icon} text-[3.6rem]`} />
-                          <span
-                            style={{
-                              fontFamily: 'var(--font-fira-code)',
-                              fontSize: '0.6rem',
-                              color: isHovered ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.28)',
-                              transition: 'color 0.25s ease',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {item.name}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                Technologies I work with
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={isInView ? { opacity: 1 } : {}}
+                transition={{ duration: 0.6, delay: 0.22 }}
+                className="text-center font-jetbrains text-sm text-white/40 mt-2 tracking-wide"
+              >
+                Modern tools for modern solutions
+              </motion.p>
+
+              {/* Progress bar */}
+              <div className="mt-6 flex justify-center">
+                <div className="w-32 h-[2px] rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full bg-white/40 rounded-full"
+                    style={{ width: `${progress * 100}%`, transition: 'none' }}
+                  />
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+
+            {/* Carousel */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="relative">
+                {/* Left fade */}
+                <div
+                  className="absolute left-0 top-0 h-full w-28 z-10 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(to right, rgba(16,17,17,1) 0%, rgba(16,17,17,0.7) 50%, transparent 100%)',
+                    backdropFilter: 'blur(4px)',
+                    WebkitBackdropFilter: 'blur(4px)',
+                    maskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
+                  }}
+                />
+                {/* Right fade */}
+                <div
+                  className="absolute right-0 top-0 h-full w-28 z-10 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(to left, rgba(16,17,17,1) 0%, rgba(16,17,17,0.7) 50%, transparent 100%)',
+                    backdropFilter: 'blur(4px)',
+                    WebkitBackdropFilter: 'blur(4px)',
+                    maskImage: 'linear-gradient(to left, black 0%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to left, black 0%, transparent 100%)',
+                  }}
+                />
+
+
+
+                {/* Center glow spotlight */}
+                <div
+                  className="absolute top-0 bottom-0 z-0 pointer-events-none"
+                  style={{
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '280px',
+                    background: 'radial-gradient(ellipse at center, rgba(100,140,255,0.07) 0%, transparent 70%)',
+                  }}
+                />
+                <div className="overflow-hidden py-5" style={{ perspective: '1200px' }}>
+                  <div ref={trackRef} className="carousel-track flex gap-[6px] w-max">
+                    {track.map((item, i) => {
+                      const isHovered  = hoveredIndex === i;
+                      const isDimmed   = hoveredIndex !== null && !isHovered;
+                      const isCenter   = centerIndex === i;
+
+                      return (
+                        <div
+                          key={`${item.name}-${i}`}
+                          onMouseEnter={() => setHoveredIndex(i)}
+                          onMouseLeave={() => setHoveredIndex(null)}
+                          className="shrink-0 cursor-default"
+                          style={{
+                            transition: 'opacity 0.25s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+                            opacity:   isDimmed ? 0.25 : 1,
+                            transform: isHovered
+                              ? 'translateY(-8px) scale(1.04) rotateX(6deg)'
+                              : isCenter
+                                ? 'translateY(-4px) scale(1.06)'
+                                : 'translateY(0) scale(1) rotateX(0deg)',
+                            zIndex: isHovered ? 10 : isCenter ? 5 : 1,
+                            position: 'relative',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width:  '120px',
+                              height: '120px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '10px',
+                              backgroundColor: isHovered
+                                ? 'rgba(20,22,24,1)'
+                                : 'rgba(13,14,15,0.9)',
+                              transition: 'background-color 0.25s ease, box-shadow 0.3s ease',
+                              boxShadow: isHovered
+                                ? '0 12px 32px rgba(0,0,0,0.6), 0 0 16px rgba(80,120,255,0.08)'
+                                : isCenter
+                                  ? '0 0 20px rgba(100,140,255,0.12), 0 4px 16px rgba(0,0,0,0.3)'
+                                  : 'none',
+                            }}
+                          >
+                            <i className={`${item.icon} text-[3.6rem]`} />
+                            <span
+                              style={{
+                                fontFamily: 'var(--font-fira-code)',
+                                fontSize: '0.6rem',
+                                color: isHovered
+                                  ? 'rgba(255,255,255,0.85)'
+                                  : isCenter
+                                    ? 'rgba(255,255,255,0.65)'
+                                    : 'rgba(255,255,255,0.28)',
+                                transition: 'color 0.25s ease',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {item.name}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+          </div>
         </div>
-      </section>
+      </div>
     </>
   );
 }
