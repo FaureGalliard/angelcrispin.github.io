@@ -179,7 +179,7 @@ export default function KpiSection() {
           transform: translateY(0);
         }
         .kpi-card {
-          transition: transform 0.50s cubic-bezier(0.34, 1.56, 0.64, 1);
+          transition: transform 1.50s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .kpi-card.done:hover {
           transform: scale(1.04) translateY(-10px);
