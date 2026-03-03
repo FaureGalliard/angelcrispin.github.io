@@ -41,9 +41,7 @@ export default function TechStack() {
         .carousel-track {
           animation: carousel 35s linear infinite;
         }
-        .carousel-mask:hover .carousel-track {
-          animation-play-state: paused;
-        }
+       
       `}</style>
 
       <section
@@ -93,8 +91,8 @@ export default function TechStack() {
             <div
               className="carousel-mask relative py-3"
               style={{
-                maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+                maskImage: 'linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)',
                 overflow: 'hidden',
               }}
             >

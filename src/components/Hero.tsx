@@ -1,24 +1,162 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faLinkedin } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { heroCard, heroContainer, heroItem, dotVariants, pulse } from "@/lib/motion/hero";
 
-// ── GridBackground con WebGL ───────────────────────────────────────────────────
-function GridBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: 0.5, y: 0.5 });
-  const targetMouseRef = useRef({ x: 0.5, y: 0.5 });
-  const prevMouseRef = useRef({ x: 0.5, y: 0.5 });
-  const influenceRef = useRef(0);
+// ── Hook: mouse position relativa a la sección ─────────────────────────────────
+
+function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
+  const h1Ref  = useRef<HTMLHeadingElement>(null);
+  const h2Ref  = useRef<HTMLSpanElement>(null);
   const rafRef = useRef<number>(0);
+
+  const currentX      = useRef(50);
+  const targetX       = useRef(50);
+  const opacity       = useRef(0);
+  const targetOpacity = useRef(0);
+
+  // Estado del sweep al salir
+  const sweeping    = useRef(false);
+  const sweepX      = useRef(0);
+  const sweepSpeed  = 1.8;
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const clearGradients = () => {
+      if (h1Ref.current) h1Ref.current.style.backgroundImage =
+        "linear-gradient(105deg, white 0%, white 100%)";
+      if (h2Ref.current) h2Ref.current.style.backgroundImage =
+        "linear-gradient(105deg, #4260c5 0%, #4260c5 100%)";
+    };
+
+    const setGradients = (x: number, o: number) => {
+      const h1Style = `linear-gradient(
+        105deg,
+        white          0%,
+        white          ${x - 20}%,
+        rgba(237,241,254,${o})   ${x - 8}%,
+        rgba(255,255,255,${o})   ${x}%,
+        rgba(180,200,255,${o * 0.9}) ${x + 5}%,
+        white          ${x + 16}%,
+        white          100%
+      )`;
+
+      const h2Style = `linear-gradient(
+        105deg,
+        #4260c5                        0%,
+        #4260c5                        ${x - 20}%,
+        rgba(122,159,255,${o})         ${x - 4}%,
+        rgba(200,216,255,${o})         ${x}%,
+        rgba(122,159,255,${o})         ${x + 7}%,
+        #4260c5                        ${x + 20}%,
+        #4260c5                        100%
+      )`;
+
+      if (h1Ref.current) h1Ref.current.style.backgroundImage = h1Style;
+      if (h2Ref.current) h2Ref.current.style.backgroundImage = h2Style;
+    };
+
+    const resetState = () => {
+      sweeping.current      = false;
+      sweepX.current        = 0;
+      currentX.current      = 50;
+      targetX.current       = 50;
+      opacity.current       = 0;
+      targetOpacity.current = 0;
+      clearGradients();
+    };
+
+    const applyShine = () => {
+      if (sweeping.current) {
+        sweepX.current = Math.min(sweepX.current + sweepSpeed, 120);
+        const x = sweepX.current;
+        const sweepOpacity = 1 - Math.max(0, (x - 80) / 40);
+
+        setGradients(x, sweepOpacity);
+
+        if (sweepX.current >= 120) {
+          sweeping.current = false;
+          opacity.current  = 0;
+          clearGradients();
+        }
+      } else {
+        currentX.current += (targetX.current - currentX.current) * 0.08;
+        opacity.current  += (targetOpacity.current - opacity.current) * 0.06;
+
+        // Si la opacidad es prácticamente cero, limpiar para evitar gradientes residuales
+        if (opacity.current < 0.01 && targetOpacity.current === 0) {
+          clearGradients();
+        } else {
+          setGradients(currentX.current, opacity.current);
+        }
+      }
+
+      rafRef.current = requestAnimationFrame(applyShine);
+    };
+
+    rafRef.current = requestAnimationFrame(applyShine);
+
+    const onMove = (e: MouseEvent) => {
+      sweeping.current      = false;
+      targetOpacity.current = 1;
+      const rect = section.getBoundingClientRect();
+      targetX.current = ((e.clientX - rect.left) / rect.width) * 100;
+    };
+
+    const onLeave = () => {
+      sweeping.current      = true;
+      sweepX.current        = currentX.current;
+      targetOpacity.current = 0;
+    };
+
+    // Limpiar inmediatamente si la ventana pierde el foco (cambio de monitor, alt+tab, etc.)
+    const onWindowBlur = () => {
+      resetState();
+    };
+
+    // Limpiar si la visibilidad cambia (tab oculta)
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        resetState();
+      }
+    };
+
+    section.addEventListener("mousemove", onMove);
+    section.addEventListener("mouseleave", onLeave);
+    window.addEventListener("blur", onWindowBlur);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      section.removeEventListener("mousemove", onMove);
+      section.removeEventListener("mouseleave", onLeave);
+      window.removeEventListener("blur", onWindowBlur);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [sectionRef]);
+
+  return { h1Ref, h2Ref };
+}
+
+
+
+// ── GridBackground ─────────────────────────────────────────────────────────────
+function GridBackground() {
+  const canvasRef     = useRef<HTMLCanvasElement>(null);
+  const mouseRef      = useRef({ x: 0.5, y: 0.5 });
+  const targetMouseRef= useRef({ x: 0.5, y: 0.5 });
+  const prevMouseRef  = useRef({ x: 0.5, y: 0.5 });
+  const influenceRef  = useRef(0);
+  const rafRef        = useRef<number>(0);
   const lastRippleRef = useRef(0);
   const rippleTimeRef = useRef(-999);
-  const ripplePosRef = useRef({ x: 0.5, y: 0.5 });
-
-  const RIPPLE_INTERVAL = 0.35; // segundos entre cada ripple
+  const ripplePosRef  = useRef({ x: 0.5, y: 0.5 });
+  const RIPPLE_INTERVAL = 0.35;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -49,66 +187,45 @@ function GridBackground() {
       uniform float rippleStart;
       uniform vec2  rippleOrigin;
       varying vec2  vUv;
-
       void main() {
         vec2  px       = vUv * iResolution;
         float cellSize = 25.0;
-
-        // ── Hover ──────────────────────────────────────────
         vec2  mousePx   = mousePosition * iResolution;
         float mouseDist = length(px - mousePx);
         float radius    = mouseRadius * iResolution.y;
         float hover     = mouseInfluence * exp(-mouseDist * mouseDist / (radius * radius));
-
-        // ── Ripple ─────────────────────────────────────────
-        float rippleDuration = 4.0;   // duración total de la onda (segundos)
-        float rippleSpeed    = 220.0; // velocidad de expansión (px/s)
-
+        float rippleDuration = 4.0;
+        float rippleSpeed    = 220.0;
         float age        = iTime - rippleStart;
         float rippleAlive = step(0.0, age) * step(age, rippleDuration);
-
         vec2  originPx   = rippleOrigin * iResolution;
         float originDist = length(px - originPx);
         float rippleAge  = age * rippleSpeed;
         float rippleRing = exp(-pow(originDist - rippleAge, 2.0) / (radius * 0.08));
         float rippleFade = 1.0 - smoothstep(rippleDuration * 0.5, rippleDuration, age);
         float ripple     = rippleRing * mouseInfluence * rippleFade * rippleAlive;
-
-        // ── Total ──────────────────────────────────────────
         float totalHover = clamp(hover + ripple * 0.6, 0.0, 1.0);
-
-        // ── Grid ───────────────────────────────────────────
         vec2  cell = fract(px / cellSize);
         float dx   = min(cell.x, 1.0 - cell.x) * cellSize;
         float dy   = min(cell.y, 1.0 - cell.y) * cellSize;
-
         float aa    = 1.0;
         float baseW = 0.1;
         float glowW = baseW + totalHover / 3.0;
-
         float lineX = 1.0 - smoothstep(baseW - aa, baseW + aa, dx);
         float lineY = 1.0 - smoothstep(baseW - aa, baseW + aa, dy);
         float grid  = max(lineX, lineY);
-
         float glowX    = 1.0 - smoothstep(glowW - aa, glowW + aa * 2.0, dx);
         float glowY    = 1.0 - smoothstep(glowW - aa, glowW + aa * 2.0, dy);
         float glowGrid = max(glowX, glowY);
-
-        // ── Color ──────────────────────────────────────────
         vec3 baseColor   = vec3(0.396, 0.420, 0.420);
-        vec3 glowColor   = vec3(0.929, 0.945, 0.996); // #EDF1FE
-        vec3 rippleColor = vec3(0.4,   0.55,  1.0);   // azul eléctrico
-
+        vec3 glowColor   = vec3(0.929, 0.945, 0.996);
+        vec3 rippleColor = vec3(0.4,   0.55,  1.0);
         vec3 finalColor = mix(baseColor, glowColor, hover * 0.9);
         finalColor      = mix(finalColor, rippleColor, ripple * 0.7);
-
-        // ── Alpha ──────────────────────────────────────────
         float baseAlpha  = 0.65;
         float finalAlpha = baseAlpha + totalHover * 0.5;
-
         float lineContrib = grid     * finalAlpha;
         float glowContrib = glowGrid * totalHover * 0.4;
-
         gl_FragColor = vec4(finalColor, lineContrib + glowContrib);
       }
     `;
@@ -133,14 +250,14 @@ function GridBackground() {
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-    const uTime        = gl.getUniformLocation(program, "iTime");
-    const uRes         = gl.getUniformLocation(program, "iResolution");
-    const uMouse       = gl.getUniformLocation(program, "mousePosition");
-    const uInfluence   = gl.getUniformLocation(program, "mouseInfluence");
-    const uRadius      = gl.getUniformLocation(program, "mouseRadius");
-    const uSpeed       = gl.getUniformLocation(program, "mouseSpeed");
-    const uRippleStart = gl.getUniformLocation(program, "rippleStart");
-    const uRippleOrigin= gl.getUniformLocation(program, "rippleOrigin");
+    const uTime         = gl.getUniformLocation(program, "iTime");
+    const uRes          = gl.getUniformLocation(program, "iResolution");
+    const uMouse        = gl.getUniformLocation(program, "mousePosition");
+    const uInfluence    = gl.getUniformLocation(program, "mouseInfluence");
+    const uRadius       = gl.getUniformLocation(program, "mouseRadius");
+    const uSpeed        = gl.getUniformLocation(program, "mouseSpeed");
+    const uRippleStart  = gl.getUniformLocation(program, "rippleStart");
+    const uRippleOrigin = gl.getUniformLocation(program, "rippleOrigin");
 
     gl.uniform1f(uRadius, 0.25);
     gl.uniform1f(uSpeed, 0);
@@ -168,8 +285,13 @@ function GridBackground() {
       influenceRef.current = 1.0;
     };
     const onLeave = () => { influenceRef.current = 0.0; };
+
+    // Reset WebGL influence on window blur too
+    const onWindowBlur = () => { influenceRef.current = 0.0; };
+
     section.addEventListener("mousemove", onMove);
     section.addEventListener("mouseleave", onLeave);
+    window.addEventListener("blur", onWindowBlur);
 
     const render = (t: number) => {
       const t_sec = t * 0.001;
@@ -185,11 +307,10 @@ function GridBackground() {
       gl.uniform1f(uSpeed, speed);
       prevMouseRef.current = { ...mouseRef.current };
 
-      // Dispara ripple cada RIPPLE_INTERVAL segundos si hay movimiento
       if (speed > 0.1 && t_sec - lastRippleRef.current > RIPPLE_INTERVAL) {
-        lastRippleRef.current   = t_sec;
-        rippleTimeRef.current   = t_sec;
-        ripplePosRef.current    = { ...mouseRef.current };
+        lastRippleRef.current = t_sec;
+        rippleTimeRef.current = t_sec;
+        ripplePosRef.current  = { ...mouseRef.current };
         gl.uniform1f(uRippleStart, t_sec);
         gl.uniform2f(uRippleOrigin, mouseRef.current.x, mouseRef.current.y);
       }
@@ -210,6 +331,7 @@ function GridBackground() {
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("blur", onWindowBlur);
       section.removeEventListener("mousemove", onMove);
       section.removeEventListener("mouseleave", onLeave);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
@@ -217,22 +339,22 @@ function GridBackground() {
   }, []);
 
   return (
-    <>
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        style={{
-          WebkitMaskImage: "linear-gradient(to bottom, black 80%, transparent 100%)",
-          maskImage: "linear-gradient(to bottom, black 65%, transparent 100%)",
-        }}
-        aria-hidden
-      />
-    </>
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{
+        WebkitMaskImage: "linear-gradient(to bottom, black 80%, transparent 100%)",
+        maskImage: "linear-gradient(to bottom, black 65%, transparent 100%)",
+      }}
+      aria-hidden
+    />
   );
 }
 
 // ── HeroContent ────────────────────────────────────────────────────────────────
-function HeroContent() {
+function HeroContent({ sectionRef }: { sectionRef: React.RefObject<HTMLElement> }) {
+  const { h1Ref, h2Ref } = useMouseShine(sectionRef);
+
   return (
     <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
       <motion.div
@@ -254,12 +376,40 @@ function HeroContent() {
             <motion.div variants={dotVariants} animate={pulse.animate} transition={{ delay: 0.4 }} className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "rgba(228,111,111,1)" }} />
           </motion.div>
 
-          <motion.h1 variants={heroItem} className="font-jetbrains text-[2.6rem] font-bold text-white text-left">
+          {/* H1 con reflejo */}
+          <motion.h1
+            ref={h1Ref}
+            variants={heroItem}
+            className="font-jetbrains text-[2.6rem] font-bold text-left"
+            style={{
+              backgroundImage: "linear-gradient(105deg, white 0%, white 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              color: "transparent",
+            }}
+          >
             Angel Crispin
           </motion.h1>
+
+          {/* H2 con reflejo en azul */}
           <motion.h2 variants={heroItem} className="text-[1rem] text-left font-bold">
-            <span className="font-jetbrains text-[#4260c5]">Software Developer &lt; / &gt;</span>
+            <span
+              ref={h2Ref}
+              className="font-jetbrains"
+              style={{
+                backgroundImage: "linear-gradient(105deg, #4260c5 0%, #4260c5 100%)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                color: "transparent",
+                display: "inline-block",
+              }}
+            >
+              Software Developer &lt; / &gt;
+            </span>
           </motion.h2>
+
           <motion.p variants={heroItem} className="font-firacode mt-4 max-w-xl text-left text-sm leading-relaxed text-gray-300">
             Desarrollo sistemas y aplicaciones con enfoque en lógica, arquitectura y eficiencia.
           </motion.p>
@@ -283,10 +433,15 @@ function HeroContent() {
 
 // ── Hero ───────────────────────────────────────────────────────────────────────
 export default function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[rgba(16,17,17,1)]">
+    <section
+      ref={sectionRef}
+      className="relative min-h-screen overflow-hidden bg-[rgba(16,17,17,1)]"
+    >
       <GridBackground />
-      <HeroContent />
+      <HeroContent sectionRef={sectionRef} />
     </section>
   );
 }
