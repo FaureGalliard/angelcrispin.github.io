@@ -192,7 +192,7 @@ function GridBackground() {
       varying vec2 vUv;
       void main() {
         vec2 px = vUv * iResolution;
-        float cellSize = 25.0;
+        float cellSize = 30.0;
         vec2 mousePx = mousePosition * iResolution;
         float mouseDist = length(px - mousePx);
         float radius = mouseRadius * iResolution.y;

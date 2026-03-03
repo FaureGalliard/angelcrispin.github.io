@@ -7,10 +7,12 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <TechStack />
       <KpiKpiSection />
-      <About />
       <Projects />
+      <TechStack />
+    
+      <About />
+      
       
       
     </>
