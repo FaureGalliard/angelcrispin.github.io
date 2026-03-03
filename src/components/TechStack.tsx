@@ -179,7 +179,7 @@ export default function TechStack() {
         <h2 className="font-jetbrains text-3xl md:text-4xl font-bold text-white leading-[1.1]">
           Technologies I work with
         </h2>
-        <p className="font-jetbrains text-xs text-white/40 leading-snug mt-2">
+        <p className="font-jetbrains text-sm text-[#4260C5] leading-snug mt-2">
           Modern tools for modern solutions
         </p>
       </motion.div>

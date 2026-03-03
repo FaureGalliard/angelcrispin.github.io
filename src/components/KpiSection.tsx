@@ -1,27 +1,25 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { BriefcaseBusiness, Globe, User } from "lucide-react";
+const unitColors = ["#6CDB95", "#F8DA63", "#E46F6F"];
 const kpiItems = [
   {
-    number: 50,
+    number: 20,
     suffix: "+",
     unit: "proyectos",
     description: "desarrollados con técnicas de alto rendimiento.",
-    icon: <Globe size={18} />,
   },
   {
-    number: 100,
+    number: 80,
     suffix: "k+",
     unit: "líneas",
     description: "de código escritas en distintos lenguajes.",
-    icon: <User size={18} />,
   },
   {
     number: 15,
     suffix: "+",
     unit: "tecnologías",
     description: "aplicadas en desarrollo de software y soluciones.",
-    icon: <BriefcaseBusiness size={18} />,
   },
 ];
 // ── Counter ───────────────────────────────────────────────────────────────────
@@ -63,12 +61,19 @@ function KpiCard({
   return (
     <div
       data-animate="up"
-      className="kpi-card relative flex items-center justify-center overflow-hidden rounded-3xl border border-[#151515] bg-[#090909] p-12 transition-colors hover:bg-white/[0.04]"
+      className="kpi-card relative flex items-center justify-center overflow-hidden rounded-3xl  border-[#151515] bg-[#090909] p-12 transition-colors "
       style={{
         minHeight: "270px",
         animationDelay: `${550 + index * 120}ms`,
       }}
     >
+      {/* Glow de color */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-3xl"
+        style={{
+          background: `radial-gradient(ellipse 80% 60% at 50% 110%, ${unitColors[index]}18 0%, transparent 70%)`,
+        }}
+      />
       {/* Grid decorativo */}
       <div
         className="pointer-events-none absolute inset-0 rounded-3xl"
@@ -93,17 +98,16 @@ function KpiCard({
                 "linear-gradient(to bottom, rgba(9,9,9,0) 0%, rgba(9,9,9,0.85) 68%, #090909 100%)",
             }}
           />
-          <p className="absolute left-1/2 -translate-x-1/2 top-[80%] font-firacode text-lg font-semibold uppercase text-white leading-none pointer-events-none">
+          <p
+            className="absolute left-1/2 -translate-x-1/2 top-[80%] font-firacode text-lg font-semibold uppercase leading-none pointer-events-none"
+            style={{ color: "#ffffff" }}
+          >
             {item.unit}
           </p>
         </div>
         <p className="font-jetbrains text-xs text-white/40 leading-tight max-w-[220px] mt-2">
           {item.description}
         </p>
-      </div>
-      {/* Icon */}
-      <div className="absolute bottom-4 left-4 z-10 flex items-center justify-center w-9 h-9 rounded-lg border border-white/[0.08] bg-white/[0.04] text-white/60">
-        {item.icon}
       </div>
     </div>
   );
@@ -119,7 +123,11 @@ export default function KpiSection() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            (entry.target as HTMLElement).classList.add("animated");
+            const el = entry.target as HTMLElement;
+            el.classList.add("animated");
+            el.addEventListener("animationend", () => {
+              el.classList.add("done");
+            }, { once: true });
             observer.unobserve(entry.target);
           }
         });
@@ -165,14 +173,18 @@ export default function KpiSection() {
         [data-animate="up"].animated {
           animation: slideFromBottom 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
-        .kpi-card {
-          transition: transform 0.25s ease-out;
+        [data-animate="up"].animated.done {
+          animation: none;
+          opacity: 1;
+          transform: translateY(0);
         }
-        .kpi-card:hover {
-          transform: scale(1.03);
+        .kpi-card {
+          transition: transform 0.50s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .kpi-card.done:hover {
+          transform: scale(1.04) translateY(-10px);
         }
       `}</style>
-
       <section
         ref={sectionRef}
         className="relative w-full bg-[#010101] py-24 px-12 overflow-hidden"
@@ -185,9 +197,6 @@ export default function KpiSection() {
             background: "linear-gradient(to bottom, #080808, #010101)",
           }}
         />
-
-       
-
         <div className="relative z-10 max-w-5xl mx-auto flex flex-col gap-12">
           {/* Header */}
           <div className="flex flex-col items-center gap-1 text-center">
@@ -212,25 +221,25 @@ export default function KpiSection() {
             </h1>
             <p
               data-animate="left"
-              className="font-jetbrains text-xs text-white/40 leading-snug"
-              style={{ animationDelay: "300ms" }}
+              className="font-jetbrains text-sm text-white/40 leading-snug"
+              style={{ animationDelay: "300ms", color: "#4260C5" }}
             >
               Ingeniería enfocada en rendimiento, calidad y evolución constante.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div
-  className="pointer-events-none absolute left-1/2 -translate-x-1/2 z-0"
-  style={{
-    top: "-520px",        // sube lo suficiente para entrar en Hero
-    width: "1900px",
-    height: "1100px",
-    background:
-      "radial-gradient(ellipse 50% 50% at 50% 75%, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 45%, transparent 70%)",
-    filter: "blur(50px)",
-    pointerEvents: "none",
-  }}
-/>
+              className="pointer-events-none absolute left-1/2 -translate-x-1/2 z-0"
+              style={{
+                top: "-520px",
+                width: "1900px",
+                height: "1100px",
+                background:
+                  "radial-gradient(ellipse 50% 50% at 50% 75%, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 45%, transparent 70%)",
+                filter: "blur(50px)",
+                pointerEvents: "none",
+              }}
+            />
             {kpiItems.map((item, i) => (
               <KpiCard
                 key={i}

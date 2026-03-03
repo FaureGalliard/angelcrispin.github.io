@@ -353,10 +353,26 @@ function HeroContent({ sectionRef }: { sectionRef: React.RefObject<HTMLElement |
             animate="show"
             transition={{ staggerChildren: 0.1 }}
           >
-            <motion.div variants={dotVariants} animate={pulse.animate} className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "rgba(108,219,149,1)" }} />
-            <motion.div variants={dotVariants} animate={pulse.animate} transition={{ delay: 0.2 }} className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "rgba(248,218,99,1)" }} />
-            <motion.div variants={dotVariants} animate={pulse.animate} transition={{ delay: 0.4 }} className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "rgba(228,111,111,1)" }} />
-          </motion.div>
+            <motion.div
+  variants={dotVariants}
+  animate={pulse.animate}
+  className="w-2.5 h-2.5 rounded-full"
+  style={{ backgroundColor: "#6CDB95" }}
+/>
+<motion.div
+  variants={dotVariants}
+  animate={pulse.animate}
+  transition={{ delay: 0.2 }}
+  className="w-2.5 h-2.5 rounded-full"
+  style={{ backgroundColor: "#F8DA63" }}
+/>
+<motion.div
+  variants={dotVariants}
+  animate={pulse.animate}
+  transition={{ delay: 0.4 }}
+  className="w-2.5 h-2.5 rounded-full"
+  style={{ backgroundColor: "#E46F6F" }}
+/></motion.div>
           <motion.h1
             ref={h1Ref}
             variants={heroItem}
