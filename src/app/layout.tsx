@@ -54,7 +54,6 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
         />
-        <Navbar/>
         <main className="min-h-[calc(100vh-8rem)] flex flex-col"> {}
           {children}
         </main>

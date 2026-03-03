@@ -1,12 +1,12 @@
 "use client";
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faLinkedin } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { heroCard, heroContainer, heroItem, dotVariants, pulse } from "@/lib/motion/hero";
 
-// ── Hook: mouse position relativa a la sección ─────────────────────────────────
+// ── Hook: mouse shine + intro sweep ───────────────────────────────────────────
 
 function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
   const h1Ref  = useRef<HTMLHeadingElement>(null);
@@ -18,10 +18,15 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
   const opacity       = useRef(0);
   const targetOpacity = useRef(0);
 
-  // Estado del sweep al salir
-  const sweeping    = useRef(false);
-  const sweepX      = useRef(0);
-  const sweepSpeed  = 1.8;
+  const sweeping   = useRef(false);
+  const sweepX     = useRef(0);
+  const sweepSpeed = 1.8;
+
+  // Intro sweep state
+  const introActive = useRef(false);
+  const introX      = useRef(-20);   // empieza fuera del borde izquierdo
+  const introSpeed  = 1.4;           // un poco más lento = más elegante
+  const introDone   = useRef(false);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -37,15 +42,14 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
     const setGradients = (x: number, o: number) => {
       const h1Style = `linear-gradient(
         105deg,
-        white          0%,
-        white          ${x - 20}%,
-        rgba(237,241,254,${o})   ${x - 8}%,
-        rgba(255,255,255,${o})   ${x}%,
-        rgba(180,200,255,${o * 0.9}) ${x + 5}%,
-        white          ${x + 16}%,
-        white          100%
+        white                          0%,
+        white                          ${x - 20}%,
+        rgba(237,241,254,${o})         ${x - 8}%,
+        rgba(255,255,255,${o})         ${x}%,
+        rgba(180,200,255,${o * 0.9})   ${x + 5}%,
+        white                          ${x + 16}%,
+        white                          100%
       )`;
-
       const h2Style = `linear-gradient(
         105deg,
         #4260c5                        0%,
@@ -56,7 +60,6 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
         #4260c5                        ${x + 20}%,
         #4260c5                        100%
       )`;
-
       if (h1Ref.current) h1Ref.current.style.backgroundImage = h1Style;
       if (h2Ref.current) h2Ref.current.style.backgroundImage = h2Style;
     };
@@ -64,6 +67,7 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
     const resetState = () => {
       sweeping.current      = false;
       sweepX.current        = 0;
+      introActive.current   = false;
       currentX.current      = 50;
       targetX.current       = 50;
       opacity.current       = 0;
@@ -71,7 +75,34 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
       clearGradients();
     };
 
+    // Opacidad del intro: fade-in al entrar, fade-out al acercarse al borde derecho
+    const introOpacity = (x: number) => {
+      if (x < 10)  return x / 10;           // sube de 0→1 en los primeros 10%
+      if (x < 85)  return 1;                // plena entre 10% y 85%
+      return 1 - (x - 85) / 35;            // baja de 1→0 entre 85% y 120%
+    };
+
     const applyShine = () => {
+      // ── INTRO SWEEP ──────────────────────────────────────────────────────
+      if (introActive.current) {
+        introX.current = Math.min(introX.current + introSpeed, 120);
+        const x = introX.current;
+        const o = Math.max(0, introOpacity(x));
+
+        setGradients(x, o);
+
+        if (x >= 120) {
+          introActive.current = false;
+          introDone.current   = true;
+          opacity.current     = 0;
+          clearGradients();
+        }
+
+        rafRef.current = requestAnimationFrame(applyShine);
+        return;
+      }
+
+      // ── EXIT SWEEP ────────────────────────────────────────────────────────
       if (sweeping.current) {
         sweepX.current = Math.min(sweepX.current + sweepSpeed, 120);
         const x = sweepX.current;
@@ -85,10 +116,10 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
           clearGradients();
         }
       } else {
+        // ── MOUSE FOLLOW ────────────────────────────────────────────────────
         currentX.current += (targetX.current - currentX.current) * 0.08;
         opacity.current  += (targetOpacity.current - opacity.current) * 0.06;
 
-        // Si la opacidad es prácticamente cero, limpiar para evitar gradientes residuales
         if (opacity.current < 0.01 && targetOpacity.current === 0) {
           clearGradients();
         } else {
@@ -99,9 +130,22 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
       rafRef.current = requestAnimationFrame(applyShine);
     };
 
+    // Lanza el intro después de que el card termine su animación de entrada (~700 ms)
+    const introDelay = setTimeout(() => {
+      if (!introDone.current) {
+        introX.current      = -20;
+        introActive.current = true;
+      }
+    }, 700);
+
     rafRef.current = requestAnimationFrame(applyShine);
 
     const onMove = (e: MouseEvent) => {
+      // Si el intro aún corre, interrumpirlo y ceder el control al mouse
+      if (introActive.current) {
+        introActive.current = false;
+        introDone.current   = true;
+      }
       sweeping.current      = false;
       targetOpacity.current = 1;
       const rect = section.getBoundingClientRect();
@@ -109,22 +153,14 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
     };
 
     const onLeave = () => {
+      if (introActive.current) return; // no interferir con el intro
       sweeping.current      = true;
       sweepX.current        = currentX.current;
       targetOpacity.current = 0;
     };
 
-    // Limpiar inmediatamente si la ventana pierde el foco (cambio de monitor, alt+tab, etc.)
-    const onWindowBlur = () => {
-      resetState();
-    };
-
-    // Limpiar si la visibilidad cambia (tab oculta)
-    const onVisibilityChange = () => {
-      if (document.hidden) {
-        resetState();
-      }
-    };
+    const onWindowBlur      = () => resetState();
+    const onVisibilityChange = () => { if (document.hidden) resetState(); };
 
     section.addEventListener("mousemove", onMove);
     section.addEventListener("mouseleave", onLeave);
@@ -132,6 +168,7 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
+      clearTimeout(introDelay);
       cancelAnimationFrame(rafRef.current);
       section.removeEventListener("mousemove", onMove);
       section.removeEventListener("mouseleave", onLeave);
@@ -143,19 +180,17 @@ function useMouseShine(sectionRef: React.RefObject<HTMLElement>) {
   return { h1Ref, h2Ref };
 }
 
-
-
 // ── GridBackground ─────────────────────────────────────────────────────────────
 function GridBackground() {
-  const canvasRef     = useRef<HTMLCanvasElement>(null);
-  const mouseRef      = useRef({ x: 0.5, y: 0.5 });
-  const targetMouseRef= useRef({ x: 0.5, y: 0.5 });
-  const prevMouseRef  = useRef({ x: 0.5, y: 0.5 });
-  const influenceRef  = useRef(0);
-  const rafRef        = useRef<number>(0);
-  const lastRippleRef = useRef(0);
-  const rippleTimeRef = useRef(-999);
-  const ripplePosRef  = useRef({ x: 0.5, y: 0.5 });
+  const canvasRef      = useRef<HTMLCanvasElement>(null);
+  const mouseRef       = useRef({ x: 0.5, y: 0.5 });
+  const targetMouseRef = useRef({ x: 0.5, y: 0.5 });
+  const prevMouseRef   = useRef({ x: 0.5, y: 0.5 });
+  const influenceRef   = useRef(0);
+  const rafRef         = useRef<number>(0);
+  const lastRippleRef  = useRef(0);
+  const rippleTimeRef  = useRef(-999);
+  const ripplePosRef   = useRef({ x: 0.5, y: 0.5 });
   const RIPPLE_INTERVAL = 0.35;
 
   useEffect(() => {
@@ -284,9 +319,7 @@ function GridBackground() {
       };
       influenceRef.current = 1.0;
     };
-    const onLeave = () => { influenceRef.current = 0.0; };
-
-    // Reset WebGL influence on window blur too
+    const onLeave      = () => { influenceRef.current = 0.0; };
     const onWindowBlur = () => { influenceRef.current = 0.0; };
 
     section.addEventListener("mousemove", onMove);
@@ -376,7 +409,6 @@ function HeroContent({ sectionRef }: { sectionRef: React.RefObject<HTMLElement> 
             <motion.div variants={dotVariants} animate={pulse.animate} transition={{ delay: 0.4 }} className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "rgba(228,111,111,1)" }} />
           </motion.div>
 
-          {/* H1 con reflejo */}
           <motion.h1
             ref={h1Ref}
             variants={heroItem}
@@ -392,7 +424,6 @@ function HeroContent({ sectionRef }: { sectionRef: React.RefObject<HTMLElement> 
             Angel Crispin
           </motion.h1>
 
-          {/* H2 con reflejo en azul */}
           <motion.h2 variants={heroItem} className="text-[1rem] text-left font-bold">
             <span
               ref={h2Ref}
