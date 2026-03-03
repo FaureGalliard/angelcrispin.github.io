@@ -412,10 +412,11 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen overflow-hidden bg-[rgba(16,17,17,1)]"
+      className="relative min-h-screen  bg-[#080808]"
     >
       <GridBackground />
       <HeroContent sectionRef={sectionRef} />
+      
     </section>
   );
 }
