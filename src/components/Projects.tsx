@@ -263,7 +263,7 @@ const Projects: React.FC = () => {
             Featured Projects
           </h2>
           <div
-            className="h-px flex-grow max-w-xs ml-4"
+            className="h-px grow max-w-xs ml-4"
             style={{ backgroundColor: C.border }}
           />
         </div>
