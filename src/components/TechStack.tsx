@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 
 const row1 = [
@@ -8,13 +8,12 @@ const row1 = [
   { name: "TypeScript",     icon: "devicon-typescript-plain colored" },
   { name: "Java",           icon: "devicon-java-plain colored" },
   { name: "Django",         icon: "devicon-django-plain colored" },
-  { name: "Flask",          icon: "devicon-flask-original colored" },
+  { name: "Flask",          icon: "devicon-flask-original" },
   { name: "Node.js",        icon: "devicon-nodejs-plain colored" },
   { name: "FastAPI",        icon: "devicon-fastapi-plain colored" },
   { name: "Supabase",       icon: "devicon-supabase-plain colored" },
   { name: "PostgreSQL",     icon: "devicon-postgresql-plain colored" },
 ];
-
 const row2 = [
   { name: "MySQL",          icon: "devicon-mysql-plain colored" },
   { name: "MongoDB",        icon: "devicon-mongodb-plain colored" },
@@ -23,7 +22,7 @@ const row2 = [
   { name: "GitHub Actions", icon: "devicon-githubactions-plain colored" },
   { name: "Vercel",         icon: "devicon-vercel-plain" },
   { name: "Cloudflare",     icon: "devicon-cloudflare-plain colored" },
-  { name: "Next.js",        icon: "devicon-nextjs-plain colored" },
+  { name: "Next.js",        icon: "devicon-nextjs-plain" },
   { name: "Tailwind CSS",   icon: "devicon-tailwindcss-plain colored" },
   { name: "React",          icon: "devicon-react-original colored" },
 ];
@@ -32,16 +31,22 @@ const GAP          = 8;
 const CARD_W       = 150 + GAP;
 const BASE_SPEED   = 0.6;
 const SCROLL_BOOST = 0.18;
+const OVERFLOW_PAD = 24;
 
-// ── Carousel row ──────────────────────────────────────────────────────────────
 function CarouselRow({
   items,
   direction = 1,
   scrollVelRef,
+  hoveredCard,
+  onHover,
+  rowId,
 }: {
   items: typeof row1;
   direction?: 1 | -1;
   scrollVelRef: React.RefObject<number>;
+  hoveredCard: string | null;
+  onHover: (id: string | null) => void;
+  rowId: string;
 }) {
   const trackRef  = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
@@ -67,45 +72,125 @@ function CarouselRow({
   }, [direction, LOOP_W, scrollVelRef]);
 
   return (
-    <div className="relative overflow-hidden" style={{ padding: `${GAP / 2}px 0` }}>
-      <div className="absolute left-0 top-0 h-full w-24 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to right, rgba(16,17,17,1) 0%, transparent 100%)' }} />
-      <div className="absolute right-0 top-0 h-full w-24 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to left, rgba(16,17,17,1) 0%, transparent 100%)' }} />
+    <>
+      <style>{`
+        .tech-card-inner {
+          transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                      box-shadow 0.35s ease;
+        }
+        .tech-card-inner.hovered {
+          transform: scale(1.05) translateY(-4px);
+          box-shadow: 0 28px 52px rgba(0,0,0,0.75),
+                      inset 0 1px 0 rgba(255,255,255,0.07);
+        }
+      `}</style>
 
-      <div ref={trackRef} className="flex w-max" style={{ gap: `${GAP}px` }}>
-        {track.map((item, i) => (
-          <div key={`${item.name}-${i}`} className="shrink-0 cursor-default">
-            <div style={{
-              width: '150px', height: '150px',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center', gap: '12px',
-              backgroundColor: 'rgba(13,14,15,0.85)',
-              borderRadius: '10px',
-            }}>
-              <i className={`${item.icon} text-[4.2rem]`} />
-              <span style={{
-                fontFamily: 'var(--font-fira-code)',
-                fontSize: '0.65rem',
-                color: 'rgba(255,255,255,0.25)',
-                whiteSpace: 'nowrap',
-              }}>
-                {item.name}
-              </span>
-            </div>
-          </div>
-        ))}
+      <div
+        className="relative"
+        style={{
+          overflowX: 'hidden',
+          overflowY: 'visible',
+          paddingTop: `${OVERFLOW_PAD}px`,
+          paddingBottom: `${OVERFLOW_PAD}px`,
+          marginTop: `-${OVERFLOW_PAD}px`,
+          marginBottom: `-${OVERFLOW_PAD}px`,
+        }}
+      >
+        {/* Gradient fade — left */}
+        <div className="absolute left-0 top-0 h-full w-24 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(to right, rgba(1,1,1,1) 0%, transparent 100%)' }} />
+        {/* Gradient fade — right */}
+        <div className="absolute right-0 top-0 h-full w-24 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(to left, rgba(1,1,1,1) 0%, transparent 100%)' }} />
+
+        <div ref={trackRef} className="flex w-max" style={{ gap: `${GAP}px` }}>
+          {track.map((item, i) => {
+            const cardId      = `${rowId}-${item.name}-${i}`;
+            const isHovered   = hoveredCard === cardId;
+            const someHovered = hoveredCard !== null;
+
+            return (
+              <div
+                key={cardId}
+                className="shrink-0 cursor-default"
+                onMouseEnter={() => onHover(cardId)}
+                onMouseLeave={() => onHover(null)}
+                style={{
+                  position: 'relative',
+                  zIndex: isHovered ? 20 : 1,
+                  opacity: someHovered && !isHovered ? 0.2 : 1,
+                  transition: 'opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
+                }}
+              >
+                <div
+                  className={`tech-card-inner${isHovered ? ' hovered' : ''}`}
+                  style={{
+                    width: '150px',
+                    height: '150px',
+                    position: 'relative',
+                    borderRadius: '10px',
+                    backgroundColor: '#090909',
+                    border: '1px solid #151515',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {/* White glow — bottom */}
+                  <div
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      borderRadius: '2x',
+                      background: isHovered
+                        ? 'radial-gradient(ellipse 80% 60% at 50% 110%, rgba(255,255,255,0.13) 0%, transparent 70%)'
+                        : 'radial-gradient(ellipse 80% 60% at 50% 110%, rgba(255,255,255,0.055) 0%, transparent 70%)',
+                      transition: 'background 0.35s ease',
+                    }}
+                  />
+
+                  {/* Decorative grid */}
+                 
+
+                  {/* Icon + label */}
+                  <div className="relative z-10 flex flex-col items-center justify-center gap-3">
+                    <i
+                      className={`${item.icon} text-[3.6rem]`}
+                      style={{
+                        filter: isHovered ? 'brightness(1.5)' : 'brightness(1.1)',
+                        transition: 'filter 0.25s ease',
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-fira-code)',
+                        fontSize: '0.6rem',
+                        letterSpacing: '0.06em',
+                        color: isHovered ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.22)',
+                        whiteSpace: 'nowrap',
+                        textTransform: 'uppercase',
+                        transition: 'color 0.25s ease',
+                      }}
+                    >
+                      {item.name}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
-// ── TechStack ─────────────────────────────────────────────────────────────────
 export default function TechStack() {
   const wrapperRef   = useRef<HTMLDivElement>(null);
   const isInView     = useInView(wrapperRef, { once: true, margin: '-80px' });
   const scrollVelRef = useRef(0);
   const lastScrollY  = useRef(0);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   useEffect(() => {
     let raf = 0;
@@ -125,49 +210,14 @@ export default function TechStack() {
       ref={wrapperRef}
       id="techstack"
       className="relative w-full py-24 overflow-hidden"
-      style={{ background: 'linear-gradient(to bottom, rgba(16,17,17,1) 0%, #010101 100%)' }}
+      style={{ background: '#010101' }}
     >
-      {/* ── Grid ultra sutil ── */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
-          backgroundSize: '30px 30px',
-        }}
-      />
-
-      {/* ── Spotlight lateral izquierdo ── */}
-      <div
-        className="pointer-events-none absolute"
-        style={{
-          left: '-10%',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '70%',
-          height: '340px',
-          borderRadius: '50%',
-          background:
-            'radial-gradient(ellipse at left center, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 35%, transparent 65%)',
-          filter: 'blur(18px)',
-        }}
-      />
-
-      {/* ── Spotlight lateral derecho (espejo, más tenue) ── */}
-      <div
-        className="pointer-events-none absolute"
-        style={{
-          right: '-10%',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '55%',
-          height: '280px',
-          borderRadius: '50%',
-          background:
-            'radial-gradient(ellipse at right center, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.008) 40%, transparent 65%)',
-          filter: 'blur(22px)',
-        }}
-      />
+      {/* Orb verde */}
+      <div className="pointer-events-none absolute" style={{ left: '10%', top: '50%', transform: 'translateY(-50%)', width: '380px', height: '380px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(108,219,149,0.13) 0%, rgba(108,219,149,0.05) 45%, transparent 70%)', filter: 'blur(40px)' }} />
+      {/* Orb amarillo */}
+      <div className="pointer-events-none absolute" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: '340px', height: '340px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(248,218,99,0.11) 0%, rgba(248,218,99,0.04) 45%, transparent 70%)', filter: 'blur(45px)' }} />
+      {/* Orb rojo */}
+      <div className="pointer-events-none absolute" style={{ right: '10%', top: '50%', transform: 'translateY(-50%)', width: '360px', height: '360px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(228,111,111,0.12) 0%, rgba(228,111,111,0.04) 45%, transparent 70%)', filter: 'blur(42px)' }} />
 
       {/* Header */}
       <motion.div
@@ -180,7 +230,8 @@ export default function TechStack() {
           Technologies I work with
         </h2>
         <p className="font-jetbrains text-sm text-[#4260C5] leading-snug mt-2">
-          Modern tools for modern solutions
+         tecnologías con las que trabajo y me gusta usar en mis proyectos.
+         
         </p>
       </motion.div>
 
@@ -192,8 +243,8 @@ export default function TechStack() {
         className="relative z-10 flex flex-col"
         style={{ gap: `${GAP}px` }}
       >
-        <CarouselRow items={row1} direction={1}  scrollVelRef={scrollVelRef} />
-        <CarouselRow items={row2} direction={-1} scrollVelRef={scrollVelRef} />
+        <CarouselRow items={row1} direction={1}  scrollVelRef={scrollVelRef} hoveredCard={hoveredCard} onHover={setHoveredCard} rowId="row1" />
+        <CarouselRow items={row2} direction={-1} scrollVelRef={scrollVelRef} hoveredCard={hoveredCard} onHover={setHoveredCard} rowId="row2" />
       </motion.div>
     </section>
   );

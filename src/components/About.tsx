@@ -126,7 +126,7 @@ export default function AboutMe() {
                 Sobre Mi
               </h2>
               <div
-                className="h-[1px] flex-grow ml-4"
+                className="h-px grow ml-4"
                 style={{ backgroundColor: "#2a2a2a" }}
               />
             </div>
@@ -187,7 +187,7 @@ export default function AboutMe() {
                 {technologies.map((tech) => (
                   <li key={tech} className="flex items-center gap-2">
                     <svg
-                      className="w-2 h-3 flex-shrink-0"
+                      className="w-2 h-3 shrink-0"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 256 512"
