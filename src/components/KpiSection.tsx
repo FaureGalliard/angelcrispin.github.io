@@ -69,7 +69,7 @@ function KpiCard({
     return (
         <div
             data-animate="up"
-            className="kpi-card relative flex items-center justify-center overflow-hidden rounded-3xl border border-white/5 bg-[#090909] p-6 sm:p-10 md:p-12 min-h-[180px] sm:min-h-[250px] md:min-h-[270px] transition-colors w-[60%] sm:w-full mx-auto "
+            className="kpi-card relative flex items-center justify-center overflow-hidden rounded-3xl border border-white/5 bg-[#090909] p-6 sm:p-10 md:p-12 min-h-45 sm:min-h-62.5 md:min-h-67.5 transition-colors w-[60%] sm:w-full mx-auto "
             style={{ animationDelay: `${550 + index * 120}ms` }}>
             {/* Glow de color */}
             <div
@@ -107,7 +107,7 @@ function KpiCard({
                         {item.unit}
                     </p>
                 </div>
-                <p className="font-jetbrains text-[10px] sm:text-xs text-white/40 leading-tight max-w-[160px] sm:max-w-[180px] md:max-w-[220px] mt-1">
+                <p className="font-jetbrains text-[10px] sm:text-xs text-white/40 leading-tight max-w-40 sm:max-w-45 md:max-w-55 mt-1">
                     {item.description}
                 </p>
             </div>
@@ -196,7 +196,7 @@ export default function KpiSection() {
                 ref={sectionRef}
                 className="relative w-full bg-[#010101] py-16 sm:py-20 md:py-24 px-4 sm:px-8 md:px-12 overflow-hidden">
                 {/* Transición Hero → KPI */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[120px] bg-gradient-to-b from-[#080808] to-[#010101]" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-30 bg-linear-to-b from-[#080808] to-[#010101]" />
 
                 <div className="relative z-10 max-w-5xl mx-auto flex flex-col gap-10 sm:gap-12">
                     {/* Header */}
@@ -226,7 +226,7 @@ export default function KpiSection() {
                     <div className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         {/* Glow de fondo */}
                         <div
-                            className="pointer-events-none absolute left-1/2 -translate-x-1/2 z-0 w-[min(1900px,300vw)] h-[1100px] blur-[50px]"
+                            className="pointer-events-none absolute left-1/2 -translate-x-1/2 z-0 w-[min(1900px,300vw)] h-225 blur-[50px]"
                             style={{
                                 top: '-520px',
                                 background:

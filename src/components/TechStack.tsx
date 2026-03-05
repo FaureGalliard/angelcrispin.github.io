@@ -92,7 +92,7 @@ function CarouselRow({
                             key={cardId}
                             onMouseEnter={() => handleHover(cardId)}
                             onMouseLeave={() => handleHover(null)}
-                            className="relative flex-shrink-0 cursor-default transition-opacity duration-300"
+                            className="relative shrink-0 cursor-default transition-opacity duration-300"
                             style={{
                                 zIndex: isHovered ? 20 : 1,
                                 opacity: anyHovered && !isHovered ? 0.13 : 1,
@@ -134,7 +134,7 @@ function CarouselRow({
 
                                 {/* Bottom radial glow — color is dynamic */}
                                 <div
-                                    className="absolute inset-0 pointer-events-none transition-[background] duration-[350ms] ease-[ease]"
+                                    className="absolute inset-0 pointer-events-none transition-[background] duration-350ms ease-[ease]"
                                     style={{
                                         background: `radial-gradient(ellipse 80% 55% at 50% 115%, ${item.color}${isHovered ? '22' : '0f'} 0%, transparent 70%)`,
                                     }}
@@ -142,7 +142,7 @@ function CarouselRow({
 
                                 {/* Icon */}
                                 <span
-                                    className="relative z-10 leading-none select-none font-bold font-mono transition-[filter] duration-[250ms] ease-[ease]"
+                                    className="relative z-10 leading-none select-none font-bold font-mono transition-[filter] duration-250ms ease-[ease]"
                                     style={{
                                         fontSize: item.isText ? 28 : 36,
                                         color: item.color,
@@ -155,7 +155,7 @@ function CarouselRow({
 
                                 {/* Label */}
                                 <span
-                                    className="relative z-10 text-[0.6rem] tracking-[0.08em] uppercase font-mono whitespace-nowrap transition-colors duration-[250ms] ease-[ease]"
+                                    className="relative z-10 text-[0.6rem] tracking-[0.08em] uppercase font-mono whitespace-nowrap transition-colors duration-250ms ease-[ease]"
                                     style={{
                                         color: isHovered
                                             ? 'rgba(255,255,255,0.65)'
@@ -264,8 +264,8 @@ export default function TechStack() {
                         left: '-10%',
                         top: '50%',
                         transform: 'translateY(-50%)',
-                        width: 800,
-                        height: 1200,
+                        width: '60%',
+                        height: '140%',
                         borderRadius: '50%',
                         background:
                             'radial-gradient(circle, rgba(108,219,149,0.13) 0%, transparent 70%)',
@@ -279,8 +279,8 @@ export default function TechStack() {
                         left: '50%',
                         top: '50%',
                         transform: 'translate(-50%,-50%)',
-                        width: 400,
-                        height: 1300,
+                        width: '60%',
+                        height: '150%',
                         borderRadius: '50%',
                         background:
                             'radial-gradient(circle, rgba(248,218,99,0.11) 0%, transparent 70%)',
@@ -294,8 +294,8 @@ export default function TechStack() {
                         right: '-10%',
                         top: '50%',
                         transform: 'translateY(-50%)',
-                        width: 800,
-                        height: 1200,
+                        width: '60%',
+                        height: '140%',
                         borderRadius: '50%',
                         background:
                             'radial-gradient(circle, rgba(228,111,111,0.12) 0%, transparent 70%)',
@@ -305,7 +305,7 @@ export default function TechStack() {
                 />
 
                 {/* Header */}
-                <div className="relative z-10 max-w-[800px] mx-auto px-12 mb-14 text-center flex flex-col items-center gap-1">
+                <div className="relative z-10 max-w-200 mx-auto px-12 mb-14 text-center flex flex-col items-center gap-1">
                     <div
                         data-animate="left"
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.625rem] mb-1 border border-gray-500 bg-black/10 text-gray-400 font-mono tracking-[0.06em] uppercase"
@@ -348,21 +348,35 @@ export default function TechStack() {
                     />
                 </div>
 
-                {/* Edge fades */}
+                {/* Edge fades - aca deberian estar los orbs color negro*/}
                 <div
-                    className="absolute left-0 top-0 bottom-0 pointer-events-none z-20"
+                    className="absolute pointer-events-none z-20"
                     style={{
-                        width: 400,
+                        left: '-15%',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: '20%',
+                        height: '100%',
+                        borderRadius: '50%',
                         background:
-                            'linear-gradient(to right, rgba(1,1,1,1) 0%, rgba(1,1,1,0.8) 30%, transparent 100%)',
+                            'radial-gradient(circle, rgba(1,1,1,1) 0%, rgba(1,1,1,0.85) 40%, transparent 75%)',
+                        filter: 'blur(28px)',
                     }}
                 />
+
+                {/* Edge orbs - right */}
                 <div
-                    className="absolute right-0 top-0 bottom-0 pointer-events-none z-20"
+                    className="absolute pointer-events-none z-20"
                     style={{
-                        width: 400,
+                        right: '-15%',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: '20%',
+                        height: '100%',
+                        borderRadius: '50%',
                         background:
-                            'linear-gradient(to left, rgba(1,1,1,1) 0%, rgba(1,1,1,0.8) 30%, transparent 100%)',
+                            'radial-gradient(circle, rgba(1,1,1,1) 0%, rgba(1,1,1,0.85) 40%, transparent 75%)',
+                        filter: 'blur(28px)',
                     }}
                 />
             </section>
