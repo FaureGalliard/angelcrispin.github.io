@@ -1,10 +1,5 @@
 import Image from 'next/image'
 
-// ─── Colors ───────────────────────────────────────────────────────────────────
-// bg:        #0e0e0e   text:      #e5e5e5   primary:   #4d9fff
-// secondary: #4dfdb4   surface:   #1a1a1a   border:    #2a2a2a
-// muted:     #6b7280
-
 // ─── Code Block Header ────────────────────────────────────────────────────────
 const CodeBlockHeader: React.FC<{ filename?: string }> = ({ filename }) => (
     <div

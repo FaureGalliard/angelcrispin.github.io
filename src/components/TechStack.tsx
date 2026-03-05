@@ -31,16 +31,28 @@ const CARD_W = 128 + GAP
 const BASE_SPEED = 0.55
 const SCROLL_BOOST = 0.12
 
-function CarouselRow({ items, direction = 1, scrollVelRef, rowId }) {
-    const trackRef = useRef(null)
+type Item = { name: string; icon: string; color: string; isText?: boolean }
+
+function CarouselRow({
+    items,
+    direction = 1,
+    scrollVelRef,
+    rowId,
+}: {
+    items: Item[]
+    direction?: number
+    scrollVelRef: React.MutableRefObject<number>
+    rowId: string
+}) {
+    const trackRef = useRef<HTMLDivElement>(null)
     const offsetRef = useRef(0)
-    const rafRef = useRef(null)
-    const [hoveredCard, setHoveredCard] = useState(null)
+    const rafRef = useRef<number | null>(null)
+    const [hoveredCard, setHoveredCard] = useState<string | null>(null)
 
     const LOOP_W = CARD_W * items.length
     const track = [...items, ...items, ...items]
 
-    const handleHover = useCallback((id) => setHoveredCard(id), [])
+    const handleHover = useCallback((id: string | null) => setHoveredCard(id), [])
 
     useEffect(() => {
         offsetRef.current = LOOP_W
@@ -64,24 +76,12 @@ function CarouselRow({ items, direction = 1, scrollVelRef, rowId }) {
     }, [direction, LOOP_W, scrollVelRef])
 
     return (
-        <div
-            style={{
-                position: 'relative',
-                overflowX: 'hidden',
-                overflowY: 'visible',
-                paddingTop: 20,
-                paddingBottom: 20,
-                marginTop: -20,
-                marginBottom: -20,
-            }}>
+        /* overflow-x hidden but overflow-y visible → need negative margin trick */
+        <div className="relative overflow-x-hidden overflow-y-visible -mt-5 -mb-5 pt-5 pb-5">
             <div
                 ref={trackRef}
-                style={{
-                    display: 'flex',
-                    width: 'max-content',
-                    gap: GAP,
-                    willChange: 'transform',
-                }}>
+                className="flex w-max will-change-transform"
+                style={{ gap: GAP }}>
                 {track.map((item, i) => {
                     const cardId = `${rowId}-${i}`
                     const isHovered = hoveredCard === cardId
@@ -92,30 +92,27 @@ function CarouselRow({ items, direction = 1, scrollVelRef, rowId }) {
                             key={cardId}
                             onMouseEnter={() => handleHover(cardId)}
                             onMouseLeave={() => handleHover(null)}
+                            className="relative flex-shrink-0 cursor-default transition-opacity duration-300"
                             style={{
-                                flexShrink: 0,
-                                position: 'relative',
                                 zIndex: isHovered ? 20 : 1,
                                 opacity: anyHovered && !isHovered ? 0.13 : 1,
-                                transition: 'opacity 0.3s ease',
-                                cursor: 'default',
                             }}>
+                            {/*
+                             * Dynamic values that depend on `item.color` or hover state
+                             * cannot be expressed as static Tailwind classes, so we keep
+                             * them as inline CSS via CSS custom properties where possible.
+                             */}
                             <div
+                                className="relative overflow-hidden flex flex-col items-center justify-center"
                                 style={{
                                     width: 128,
                                     height: 128,
                                     borderRadius: 16,
+                                    gap: 10,
                                     backgroundColor: '#090909',
                                     border: isHovered
                                         ? `1px solid ${item.color}44`
                                         : '1px solid #151515',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: 10,
-                                    position: 'relative',
-                                    overflow: 'hidden',
                                     transform: isHovered
                                         ? 'scale(1.05) translateY(-6px)'
                                         : 'scale(1) translateY(0)',
@@ -125,62 +122,44 @@ function CarouselRow({ items, direction = 1, scrollVelRef, rowId }) {
                                     transition:
                                         'transform 1.5s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease, border-color 0.3s ease',
                                 }}>
-                                {/* Grid decorativo sutil */}
+                                {/* Decorative grid */}
                                 <div
+                                    className="absolute inset-0 pointer-events-none"
                                     style={{
-                                        position: 'absolute',
-                                        inset: 0,
                                         backgroundImage:
                                             'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
                                         backgroundSize: '24px 24px',
-                                        pointerEvents: 'none',
                                     }}
                                 />
 
-                                {/* Glow radial desde abajo */}
+                                {/* Bottom radial glow — color is dynamic */}
                                 <div
+                                    className="absolute inset-0 pointer-events-none transition-[background] duration-[350ms] ease-[ease]"
                                     style={{
-                                        position: 'absolute',
-                                        inset: 0,
                                         background: `radial-gradient(ellipse 80% 55% at 50% 115%, ${item.color}${isHovered ? '22' : '0f'} 0%, transparent 70%)`,
-                                        transition: 'background 0.35s ease',
-                                        pointerEvents: 'none',
                                     }}
                                 />
 
                                 {/* Icon */}
                                 <span
+                                    className="relative z-10 leading-none select-none font-bold font-mono transition-[filter] duration-[250ms] ease-[ease]"
                                     style={{
-                                        position: 'relative',
-                                        zIndex: 1,
                                         fontSize: item.isText ? 28 : 36,
-                                        fontWeight: 'bold',
                                         color: item.color,
-                                        fontFamily: 'monospace',
-                                        lineHeight: 1,
                                         filter: isHovered
                                             ? 'brightness(1.35)'
                                             : 'brightness(0.9)',
-                                        transition: 'filter 0.25s ease',
-                                        userSelect: 'none',
                                     }}>
                                     {item.icon}
                                 </span>
 
                                 {/* Label */}
                                 <span
+                                    className="relative z-10 text-[0.6rem] tracking-[0.08em] uppercase font-mono whitespace-nowrap transition-colors duration-[250ms] ease-[ease]"
                                     style={{
-                                        position: 'relative',
-                                        zIndex: 1,
-                                        fontSize: '0.6rem',
-                                        letterSpacing: '0.08em',
-                                        textTransform: 'uppercase',
-                                        fontFamily: 'monospace',
                                         color: isHovered
                                             ? 'rgba(255,255,255,0.65)'
                                             : 'rgba(255,255,255,0.18)',
-                                        transition: 'color 0.25s ease',
-                                        whiteSpace: 'nowrap',
                                     }}>
                                     {item.name}
                                 </span>
@@ -194,10 +173,10 @@ function CarouselRow({ items, direction = 1, scrollVelRef, rowId }) {
 }
 
 export default function TechStack() {
-    const wrapperRef = useRef(null)
+    const wrapperRef = useRef<HTMLElement>(null)
     const scrollVelRef = useRef(0)
-    const lastScrollY = useRef(null)
-    const scrollTimeoutRef = useRef(null)
+    const lastScrollY = useRef<number | null>(null)
+    const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     useEffect(() => {
         const onScroll = () => {
@@ -223,16 +202,15 @@ export default function TechStack() {
         }
     }, [])
 
-    // Mismo sistema de animaciones que KpiSection
     useEffect(() => {
         const el = wrapperRef.current
         if (!el) return
-        const elements = el.querySelectorAll('[data-animate]')
+        const elements = el.querySelectorAll<HTMLElement>('[data-animate]')
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        const target = entry.target
+                        const target = entry.target as HTMLElement
                         target.classList.add('animated')
                         target.addEventListener(
                             'animationend',
@@ -277,17 +255,12 @@ export default function TechStack() {
 
             <section
                 ref={wrapperRef}
-                style={{
-                    position: 'relative',
-                    width: '100%',
-                    padding: '96px 0',
-                    background: '#010101',
-                    overflow: 'hidden',
-                }}>
-                {/* Orbs de fondo */}
+                className="relative w-full py-24 overflow-hidden"
+                style={{ background: '#010101' }}>
+                {/* Background orbs */}
                 <div
+                    className="absolute pointer-events-none"
                     style={{
-                        position: 'absolute',
                         left: '-10%',
                         top: '50%',
                         transform: 'translateY(-50%)',
@@ -297,13 +270,12 @@ export default function TechStack() {
                         background:
                             'radial-gradient(circle, rgba(108,219,149,0.13) 0%, transparent 70%)',
                         filter: 'blur(40px)',
-                        pointerEvents: 'none',
                         zIndex: 1,
                     }}
                 />
                 <div
+                    className="absolute pointer-events-none"
                     style={{
-                        position: 'absolute',
                         left: '50%',
                         top: '50%',
                         transform: 'translate(-50%,-50%)',
@@ -313,13 +285,12 @@ export default function TechStack() {
                         background:
                             'radial-gradient(circle, rgba(248,218,99,0.11) 0%, transparent 70%)',
                         filter: 'blur(45px)',
-                        pointerEvents: 'none',
                         zIndex: 1,
                     }}
                 />
                 <div
+                    className="absolute pointer-events-none"
                     style={{
-                        position: 'absolute',
                         right: '-10%',
                         top: '50%',
                         transform: 'translateY(-50%)',
@@ -329,86 +300,40 @@ export default function TechStack() {
                         background:
                             'radial-gradient(circle, rgba(228,111,111,0.12) 0%, transparent 70%)',
                         filter: 'blur(42px)',
-                        pointerEvents: 'none',
                         zIndex: 1,
                     }}
                 />
 
-                {/* ── Header ── */}
-                <div
-                    style={{
-                        position: 'relative',
-                        zIndex: 10,
-                        maxWidth: 800,
-                        margin: '0 auto',
-                        padding: '0 48px',
-                        marginBottom: 56,
-                        textAlign: 'center',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 4,
-                    }}>
-                    {/* Badge — eco visual con KpiSection, mismo patrón */}
+                {/* Header */}
+                <div className="relative z-10 max-w-[800px] mx-auto px-12 mb-14 text-center flex flex-col items-center gap-1">
                     <div
                         data-animate="left"
-                        style={{
-                            animationDelay: '0ms',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            padding: '2px 10px',
-                            borderRadius: 9999,
-                            fontSize: '0.625rem',
-                            marginBottom: 4,
-                            border: '1px solid #6B7280',
-                            backgroundColor: 'rgba(0,0,0,0.1)',
-                            color: '#9CA3AF',
-                            fontFamily: 'monospace',
-                            letterSpacing: '0.06em',
-                            textTransform: 'uppercase',
-                        }}>
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.625rem] mb-1 border border-gray-500 bg-black/10 text-gray-400 font-mono tracking-[0.06em] uppercase"
+                        style={{ animationDelay: '0ms' }}>
                         Stack Tecnológico
                     </div>
 
                     <h2
                         data-animate="left"
-                        style={{
-                            animationDelay: '150ms',
-                            fontFamily: 'monospace',
-                            fontSize: '1.75rem',
-                            fontWeight: 'bold',
-                            color: '#fff',
-                            margin: 0,
-                            lineHeight: 1.1,
-                        }}>
+                        className="font-mono text-[1.75rem] font-bold text-white m-0 leading-none"
+                        style={{ animationDelay: '150ms' }}>
                         Codea, Construye, Repite
                     </h2>
 
                     <p
                         data-animate="left"
-                        style={{
-                            animationDelay: '300ms',
-                            fontFamily: 'monospace',
-                            fontSize: '0.875rem',
-                            color: '#4260C5',
-                            margin: 0,
-                        }}>
+                        className="font-mono text-sm m-0"
+                        style={{ animationDelay: '300ms', color: '#4260C5' }}>
                         Una vista a las tecnologías que utilizo para crear software de
                         alta calidad.
                     </p>
                 </div>
 
-                {/* ── Carousels ── */}
+                {/* Carousels */}
                 <div
                     data-animate="up"
-                    style={{
-                        animationDelay: '400ms',
-                        position: 'relative',
-                        zIndex: 10,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: GAP,
-                    }}>
+                    className="relative z-10 flex flex-col"
+                    style={{ animationDelay: '400ms', gap: GAP }}>
                     <CarouselRow
                         items={row1}
                         direction={1}
@@ -423,31 +348,21 @@ export default function TechStack() {
                     />
                 </div>
 
-                {/* Fades laterales */}
+                {/* Edge fades */}
                 <div
+                    className="absolute left-0 top-0 bottom-0 pointer-events-none z-20"
                     style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
                         width: 400,
                         background:
                             'linear-gradient(to right, rgba(1,1,1,1) 0%, rgba(1,1,1,0.8) 30%, transparent 100%)',
-                        pointerEvents: 'none',
-                        zIndex: 20,
                     }}
                 />
                 <div
+                    className="absolute right-0 top-0 bottom-0 pointer-events-none z-20"
                     style={{
-                        position: 'absolute',
-                        right: 0,
-                        top: 0,
-                        bottom: 0,
                         width: 400,
                         background:
                             'linear-gradient(to left, rgba(1,1,1,1) 0%, rgba(1,1,1,0.8) 30%, transparent 100%)',
-                        pointerEvents: 'none',
-                        zIndex: 20,
                     }}
                 />
             </section>
