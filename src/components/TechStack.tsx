@@ -1,205 +1,194 @@
 'use client'
-import { useRef, useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 
-const row1 = [
-    { name: 'Python', icon: '🐍', color: '#3776AB' },
-    { name: 'C++', icon: '⚙️', color: '#00599C' },
-    { name: 'TypeScript', icon: '𝗧𝗦', color: '#3178C6', isText: true },
-    { name: 'Java', icon: '☕', color: '#ED8B00' },
-    { name: 'Django', icon: '🎸', color: '#092E20' },
-    { name: 'Flask', icon: '🧪', color: '#ffffff' },
-    { name: 'Node.js', icon: '⬡', color: '#539E43', isText: true },
-    { name: 'FastAPI', icon: '⚡', color: '#009688' },
-    { name: 'Supabase', icon: '🔋', color: '#3ECF8E' },
-    { name: 'PostgreSQL', icon: '🐘', color: '#336791' },
+const ROW_1 = [
+    { name: 'Python', icon: 'devicon-python-plain', color: '#3776AB' },
+    { name: 'C++', icon: 'devicon-cplusplus-plain', color: '#00599C' },
+    { name: 'TypeScript', icon: 'devicon-typescript-plain', color: '#3178C6' },
+    { name: 'Java', icon: 'devicon-java-plain', color: '#ED8B00' },
+    { name: 'Django', icon: 'devicon-django-plain', color: '#44B78B' },
+    { name: 'Flask', icon: 'devicon-flask-original', color: '#ffffff' },
+    { name: 'Node.js', icon: 'devicon-nodejs-plain', color: '#539E43' },
+    { name: 'FastAPI', icon: 'devicon-fastapi-plain', color: '#009688' },
+    { name: 'Supabase', icon: 'devicon-supabase-plain', color: '#3ECF8E' },
+    { name: 'PostgreSQL', icon: 'devicon-postgresql-plain', color: '#336791' },
 ]
-const row2 = [
-    { name: 'MySQL', icon: '🐬', color: '#4479A1' },
-    { name: 'MongoDB', icon: '🍃', color: '#47A248' },
-    { name: 'Git', icon: '🔀', color: '#F05032' },
-    { name: 'Docker', icon: '🐳', color: '#2496ED' },
-    { name: 'GH Actions', icon: '⚙️', color: '#2088FF' },
-    { name: 'Vercel', icon: '▲', color: '#ffffff', isText: true },
-    { name: 'Cloudflare', icon: '☁️', color: '#F48120' },
-    { name: 'Next.js', icon: 'N', color: '#ffffff', isText: true },
-    { name: 'Tailwind', icon: '🌊', color: '#06B6D4' },
-    { name: 'React', icon: '⚛', color: '#61DAFB', isText: true },
+const ROW_2 = [
+    { name: 'MySQL', icon: 'devicon-mysql-plain', color: '#4479A1' },
+    { name: 'MongoDB', icon: 'devicon-mongodb-plain', color: '#47A248' },
+    { name: 'Git', icon: 'devicon-git-plain', color: '#F05032' },
+    { name: 'Docker', icon: 'devicon-docker-plain', color: '#2496ED' },
+    { name: 'GitHub Actions', icon: 'devicon-githubactions-plain', color: '#2088FF' },
+    { name: 'Vercel', icon: 'devicon-vercel-plain', color: '#ffffff' },
+    { name: 'Cloudflare', icon: 'devicon-cloudflare-plain', color: '#F48120' },
+    { name: 'Next.js', icon: 'devicon-nextjs-plain', color: '#ffffff' },
+    { name: 'Tailwind CSS', icon: 'devicon-tailwindcss-plain', color: '#06B6D4' },
+    { name: 'React', icon: 'devicon-react-original', color: '#61DAFB' },
 ]
 
-const GAP = 8
-const CARD_W = 128 + GAP
-const BASE_SPEED = 0.55
-const SCROLL_BOOST = 0.12
+interface TechItem {
+    name: string
+    icon: string
+    color: string
+}
 
-type Item = { name: string; icon: string; color: string; isText?: boolean }
+const TechCard: React.FC<{
+    item: TechItem
+    isHovered: boolean
+    anyHovered: boolean
+    onEnter: () => void
+    onLeave: () => void
+}> = ({ item, isHovered, anyHovered, onEnter, onLeave }) => (
+    <div
+        className="tech-card"
+        onMouseEnter={onEnter}
+        onMouseLeave={onLeave}
+        style={{
+            opacity: anyHovered && !isHovered ? 0.12 : 1,
+            transform: isHovered
+                ? 'scale(1.02) translateY(-4px)'
+                : 'scale(1) translateY(0)',
+            borderColor: isHovered ? `${item.color}33` : 'transparent',
+            boxShadow: isHovered
+                ? `0 18px 40px rgba(0,0,0,0.7), 0 0 24px ${item.color}25`
+                : 'none',
+            zIndex: isHovered ? 20 : 1,
+            // Dynamic bottom glow via CSS var
+            ['--glow-color' as string]: item.color,
+            ['--glow-opacity' as string]: isHovered ? '0.18' : '0.07',
+        }}>
+        {/* Bottom radial glow */}
+        <div className="tech-card-glow" />
+        {/* Decorative grid */}
 
-function CarouselRow({
-    items,
-    direction = 1,
-    scrollVelRef,
-    rowId,
-}: {
-    items: Item[]
-    direction?: number
-    scrollVelRef: React.MutableRefObject<number>
-    rowId: string
-}) {
+        <i
+            className={`${item.icon} tech-icon`}
+            style={{
+                color: item.color,
+                filter: isHovered ? 'brightness(0.9)' : 'brightness(0.85)',
+            }}
+        />
+        <span
+            className="tech-name"
+            style={{ color: isHovered ? 'rgba(255,255,255,0.7)' : '#d4d4d4' }}>
+            {item.name}
+        </span>
+    </div>
+)
+
+const BASE_SPEED = 80
+const SCROLL_RATIO = 0.5
+
+function useMarqueeRow(invertScroll = false) {
     const trackRef = useRef<HTMLDivElement>(null)
-    const offsetRef = useRef(0)
-    const rafRef = useRef<number | null>(null)
-    const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-
-    const LOOP_W = CARD_W * items.length
-    const track = [...items, ...items, ...items]
-
-    const handleHover = useCallback((id: string | null) => setHoveredCard(id), [])
+    const reverseRef = useRef(invertScroll)
+    const posRef = useRef(0)
+    const rafRef = useRef<number>(0)
+    const lastTime = useRef<number>(0)
 
     useEffect(() => {
-        offsetRef.current = LOOP_W
-        const tick = () => {
-            const vel = scrollVelRef.current ?? 0
-            const boost = Math.abs(vel) > 1 ? vel * SCROLL_BOOST * direction : 0
-            offsetRef.current += BASE_SPEED * direction + boost
-
-            if (offsetRef.current >= LOOP_W * 2) offsetRef.current -= LOOP_W
-            else if (offsetRef.current < LOOP_W) offsetRef.current += LOOP_W
-
-            if (trackRef.current)
-                trackRef.current.style.transform = `translateX(-${offsetRef.current.toFixed(2)}px)`
-
-            rafRef.current = requestAnimationFrame(tick)
+        const trackEl = trackRef.current
+        if (!trackEl) return
+        const halfWidth = trackEl.scrollWidth / 2
+        if (invertScroll) posRef.current = -halfWidth / 2
+        const animate = (time: number) => {
+            if (lastTime.current) {
+                const delta = (time - lastTime.current) / 1000
+                const move = BASE_SPEED * delta
+                if (reverseRef.current) {
+                    posRef.current += move
+                    if (posRef.current >= 0) posRef.current = -halfWidth
+                } else {
+                    posRef.current -= move
+                    if (posRef.current <= -halfWidth) posRef.current = 0
+                }
+                trackEl.style.transform = `translateX(${posRef.current}px)`
+            }
+            lastTime.current = time
+            rafRef.current = requestAnimationFrame(animate)
         }
-        rafRef.current = requestAnimationFrame(tick)
-        return () => {
-            if (rafRef.current) cancelAnimationFrame(rafRef.current)
-        }
-    }, [direction, LOOP_W, scrollVelRef])
+        rafRef.current = requestAnimationFrame(animate)
+        return () => cancelAnimationFrame(rafRef.current)
+    }, [])
+
+    return { trackRef, reverseRef, posRef }
+}
+
+/* Filas con estado de hover propio */
+function MarqueeRow({
+    items,
+    trackRef,
+}: {
+    items: TechItem[]
+    trackRef: React.RefObject<HTMLDivElement>
+}) {
+    const [hoveredId, setHoveredId] = useState<number | null>(null)
+    const enter = useCallback((i: number) => setHoveredId(i), [])
+    const leave = useCallback(() => setHoveredId(null), [])
+    const anyHovered = hoveredId !== null
 
     return (
-        /* overflow-x hidden but overflow-y visible → need negative margin trick */
-        <div className="relative overflow-x-hidden overflow-y-visible -mt-5 -mb-5 pt-5 pb-5">
+        <div className="marquee-row">
+            <div className="marquee-fade marquee-fade-left" />
+            <div className="marquee-fade marquee-fade-right" />
             <div
                 ref={trackRef}
-                className="flex w-max will-change-transform"
-                style={{ gap: GAP }}>
-                {track.map((item, i) => {
-                    const cardId = `${rowId}-${i}`
-                    const isHovered = hoveredCard === cardId
-                    const anyHovered = hoveredCard !== null
-
-                    return (
-                        <div
-                            key={cardId}
-                            onMouseEnter={() => handleHover(cardId)}
-                            onMouseLeave={() => handleHover(null)}
-                            className="relative shrink-0 cursor-default transition-opacity duration-300"
-                            style={{
-                                zIndex: isHovered ? 20 : 1,
-                                opacity: anyHovered && !isHovered ? 0.13 : 1,
-                            }}>
-                            {/*
-                             * Dynamic values that depend on `item.color` or hover state
-                             * cannot be expressed as static Tailwind classes, so we keep
-                             * them as inline CSS via CSS custom properties where possible.
-                             */}
-                            <div
-                                className="relative overflow-hidden flex flex-col items-center justify-center"
-                                style={{
-                                    width: 128,
-                                    height: 128,
-                                    borderRadius: 16,
-                                    gap: 10,
-                                    backgroundColor: '#090909',
-                                    border: isHovered
-                                        ? `1px solid ${item.color}44`
-                                        : '1px solid #151515',
-                                    transform: isHovered
-                                        ? 'scale(1.05) translateY(-6px)'
-                                        : 'scale(1) translateY(0)',
-                                    boxShadow: isHovered
-                                        ? `0 16px 36px rgba(0,0,0,0.65), 0 0 20px ${item.color}1a`
-                                        : 'none',
-                                    transition:
-                                        'transform 1.5s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease, border-color 0.3s ease',
-                                }}>
-                                {/* Decorative grid */}
-                                <div
-                                    className="absolute inset-0 pointer-events-none"
-                                    style={{
-                                        backgroundImage:
-                                            'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
-                                        backgroundSize: '24px 24px',
-                                    }}
-                                />
-
-                                {/* Bottom radial glow — color is dynamic */}
-                                <div
-                                    className="absolute inset-0 pointer-events-none transition-[background] duration-350ms ease-[ease]"
-                                    style={{
-                                        background: `radial-gradient(ellipse 80% 55% at 50% 115%, ${item.color}${isHovered ? '22' : '0f'} 0%, transparent 70%)`,
-                                    }}
-                                />
-
-                                {/* Icon */}
-                                <span
-                                    className="relative z-10 leading-none select-none font-bold font-mono transition-[filter] duration-250ms ease-[ease]"
-                                    style={{
-                                        fontSize: item.isText ? 28 : 36,
-                                        color: item.color,
-                                        filter: isHovered
-                                            ? 'brightness(1.35)'
-                                            : 'brightness(0.9)',
-                                    }}>
-                                    {item.icon}
-                                </span>
-
-                                {/* Label */}
-                                <span
-                                    className="relative z-10 text-[0.6rem] tracking-[0.08em] uppercase font-mono whitespace-nowrap transition-colors duration-250ms ease-[ease]"
-                                    style={{
-                                        color: isHovered
-                                            ? 'rgba(255,255,255,0.65)'
-                                            : 'rgba(255,255,255,0.18)',
-                                    }}>
-                                    {item.name}
-                                </span>
-                            </div>
-                        </div>
-                    )
-                })}
+                className="marquee-track">
+                {items.map((item, i) => (
+                    <TechCard
+                        key={i}
+                        item={item}
+                        isHovered={hoveredId === i}
+                        anyHovered={anyHovered}
+                        onEnter={() => enter(i)}
+                        onLeave={leave}
+                    />
+                ))}
             </div>
         </div>
     )
 }
 
-export default function TechStack() {
+const TechStack: React.FC = () => {
     const wrapperRef = useRef<HTMLElement>(null)
-    const scrollVelRef = useRef(0)
-    const lastScrollY = useRef<number | null>(null)
-    const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const track1 = [...ROW_1, ...ROW_1]
+    const track2 = [...ROW_2, ...ROW_2]
+    const row1 = useMarqueeRow(false)
+    const row2 = useMarqueeRow(true)
+    const lastScrollY = useRef(typeof window !== 'undefined' ? window.scrollY : 0)
 
     useEffect(() => {
+        const track1El = row1.trackRef.current
+        const track2El = row2.trackRef.current
+        if (!track1El || !track2El) return
         const onScroll = () => {
-            const cur = window.scrollY
-            if (lastScrollY.current === null) {
-                lastScrollY.current = cur
-                return
+            const currentScrollY = window.scrollY
+            const scrollDelta = currentScrollY - lastScrollY.current
+            lastScrollY.current = currentScrollY
+            if (scrollDelta === 0) return
+            const goingDown = scrollDelta > 0
+            row1.reverseRef.current = !goingDown
+            row2.reverseRef.current = goingDown
+            const half1 = track1El.scrollWidth / 2
+            const half2 = track2El.scrollWidth / 2
+            const absDelta = Math.abs(scrollDelta) * SCROLL_RATIO
+            if (row1.reverseRef.current) {
+                row1.posRef.current += absDelta
+                if (row1.posRef.current >= 0) row1.posRef.current = -half1
+            } else {
+                row1.posRef.current -= absDelta
+                if (row1.posRef.current <= -half1) row1.posRef.current = 0
             }
-            const delta = cur - lastScrollY.current
-            lastScrollY.current = cur
-            if (Math.abs(delta) < 1) return
-            scrollVelRef.current = delta
-            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-            scrollTimeoutRef.current = setTimeout(() => {
-                scrollVelRef.current = 0
-            }, 80)
+            if (row2.reverseRef.current) {
+                row2.posRef.current += absDelta
+                if (row2.posRef.current >= 0) row2.posRef.current = -half2
+            } else {
+                row2.posRef.current -= absDelta
+                if (row2.posRef.current <= -half2) row2.posRef.current = 0
+            }
         }
-        lastScrollY.current = window.scrollY
         window.addEventListener('scroll', onScroll, { passive: true })
-        return () => {
-            window.removeEventListener('scroll', onScroll)
-            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-        }
+        return () => window.removeEventListener('scroll', onScroll)
     }, [])
 
     useEffect(() => {
@@ -230,156 +219,228 @@ export default function TechStack() {
     return (
         <>
             <style>{`
-                @keyframes slideFromLeft {
-                    from { opacity: 0; transform: translateX(-50px); }
-                    to   { opacity: 1; transform: translateX(0); }
-                }
-                @keyframes slideFromBottom {
-                    from { opacity: 0; transform: translateY(50px); }
-                    to   { opacity: 1; transform: translateY(0); }
-                }
-                [data-animate="left"],
-                [data-animate="up"] { opacity: 0; }
-                [data-animate="left"].animated {
-                    animation: slideFromLeft 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-                }
-                [data-animate="up"].animated {
-                    animation: slideFromBottom 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-                }
-                [data-animate].animated.done {
-                    animation: none;
-                    opacity: 1;
-                    transform: none;
-                }
-            `}</style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+@keyframes slideFromLeft {
+    from { opacity: 0; transform: translateX(-50px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+[data-animate="left"] { opacity: 0; }
+[data-animate="left"].animated {
+    animation: slideFromLeft 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+[data-animate="left"].animated.done {
+    animation: none; opacity: 1; transform: none;
+}
+
+.marquee-section {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #000;
+    padding: 5rem 0 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.orb {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(40px);
+    z-index: 1;
+}
+.orb-left {
+    left: -10%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60%;
+    height: 140%;
+    background: radial-gradient(circle, rgba(108,219,149,0.13) 0%, transparent 70%);
+    filter: blur(40px);
+}
+.orb-center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 150%;
+    background: radial-gradient(circle, rgba(248,218,99,0.11) 0%, transparent 70%);
+    filter: blur(45px);
+}
+.orb-right {
+    right: -10%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60%;
+    height: 140%;
+    background: radial-gradient(circle, rgba(228,111,111,0.12) 0%, transparent 70%);
+    filter: blur(42px);
+}
+
+/* Header */
+.stack-header {
+    position: relative; z-index: 10;
+    max-width: 800px; margin: 0 auto 3rem;
+    padding: 0 3rem; text-align: center;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 0.25rem;
+}
+.stack-badge {
+    display: inline-flex; align-items: center;
+    padding: 0.125rem 0.625rem; border-radius: 9999px;
+    font-size: 0.625rem; margin-bottom: 0.25rem;
+    border: 1px solid #6b7280; background: rgba(0,0,0,0.1);
+    color: #9ca3af; font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em; text-transform: uppercase;
+}
+.stack-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.75rem; font-weight: 700;
+    color: #fff; margin: 0; line-height: 1;
+}
+.stack-subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    margin: 0;
+    color: #4260C5;
+}
+
+/* Rows */
+.marquee-row { position: relative; z-index: 10; overflow: visible; }
+.marquee-track {
+    display: flex; align-items: center;
+    width: max-content; will-change: transform;
+    padding: 2px 0; /* room for scale+translateY */
+}
+
+/* Cards */
+.tech-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    width: 240px;
+    height: 130px;
+    flex-shrink: 0;
+    margin: 0 .6rem;
+    background: #000;
+    border-radius: 1px;
+    border: 1px solid transparent;
+    cursor: default;
+    transition:
+        opacity 0.3s ease,
+        transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.35s ease,
+        border-color 0.3s ease;
+    overflow: hidden;
+}
+
+/* Gradient border via pseudo */
+.tech-card::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: 1px;
+    padding: 1px;
+    background: linear-gradient(175deg, #FFFFFF1A, transparent 18%, transparent 85%, #FFFFFF1A);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Dynamic bottom glow using CSS var set inline */
+.tech-card-glow {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(
+        ellipse 80% 55% at 50% 115%,
+        color-mix(in srgb, var(--glow-color, #fff) calc(var(--glow-opacity, 0.07) * 100%), transparent) 0%,
+        transparent 40%
+    );
+    transition: background 0.35s ease;
+    z-index: 0;
+}
+
+/* Subtle dot grid */
+.tech-card-grid {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 22px 22px;
+}
+
+.tech-icon {
+    position: relative; z-index: 2;
+    font-size: 2.4rem;
+    transition: filter 0.25s ease, color 0.25s ease;
+}
+/* Remove any devicon color overrides */
+.tech-icon::before { color: inherit !important; }
+
+.tech-name {
+    position: relative; z-index: 2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    transition: color 0.25s ease;
+    white-space: nowrap;
+}
+
+.marquee-fade {
+    position: absolute; top: 0; bottom: 0;
+    width: 140px; pointer-events: none; z-index: 20;
+}
+.marquee-fade-left {
+    left: 0;
+    background: linear-gradient(to right, #000 0%, transparent 100%);
+}
+.marquee-fade-right {
+    right: 0;
+    background: linear-gradient(to left, #000 0%, transparent 100%);
+}
+`}</style>
 
             <section
                 ref={wrapperRef}
-                className="relative w-full py-24 overflow-hidden"
-                style={{ background: '#010101' }}>
-                {/* Background orbs */}
-                <div
-                    className="absolute pointer-events-none"
-                    style={{
-                        left: '-10%',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        width: '60%',
-                        height: '140%',
-                        borderRadius: '50%',
-                        background:
-                            'radial-gradient(circle, rgba(108,219,149,0.13) 0%, transparent 70%)',
-                        filter: 'blur(40px)',
-                        zIndex: 1,
-                    }}
-                />
-                <div
-                    className="absolute pointer-events-none"
-                    style={{
-                        left: '50%',
-                        top: '50%',
-                        transform: 'translate(-50%,-50%)',
-                        width: '60%',
-                        height: '150%',
-                        borderRadius: '50%',
-                        background:
-                            'radial-gradient(circle, rgba(248,218,99,0.11) 0%, transparent 70%)',
-                        filter: 'blur(45px)',
-                        zIndex: 1,
-                    }}
-                />
-                <div
-                    className="absolute pointer-events-none"
-                    style={{
-                        right: '-10%',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        width: '60%',
-                        height: '140%',
-                        borderRadius: '50%',
-                        background:
-                            'radial-gradient(circle, rgba(228,111,111,0.12) 0%, transparent 70%)',
-                        filter: 'blur(42px)',
-                        zIndex: 1,
-                    }}
-                />
-
-                {/* Header */}
-                <div className="relative z-10 max-w-200 mx-auto px-12 mb-14 text-center flex flex-col items-center gap-1">
+                className="marquee-section">
+                <div className="orb orb-left" />
+                <div className="orb orb-center" />
+                <div className="orb orb-right" />
+                <div className="stack-header">
                     <div
                         data-animate="left"
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.625rem] mb-1 border border-gray-500 bg-black/10 text-gray-400 font-mono tracking-[0.06em] uppercase"
+                        className="stack-badge"
                         style={{ animationDelay: '0ms' }}>
                         Stack Tecnológico
                     </div>
-
                     <h2
                         data-animate="left"
-                        className="font-mono text-[1.75rem] font-bold text-white m-0 leading-none"
+                        className="stack-title"
                         style={{ animationDelay: '150ms' }}>
                         Codea, Construye, Repite
                     </h2>
-
                     <p
                         data-animate="left"
-                        className="font-mono text-sm m-0"
-                        style={{ animationDelay: '300ms', color: '#4260C5' }}>
+                        className="stack-subtitle"
+                        style={{ animationDelay: '300ms' }}>
                         Una vista a las tecnologías que utilizo para crear software de
                         alta calidad.
                     </p>
                 </div>
 
-                {/* Carousels */}
-                <div
-                    data-animate="up"
-                    className="relative z-10 flex flex-col"
-                    style={{ animationDelay: '400ms', gap: GAP }}>
-                    <CarouselRow
-                        items={row1}
-                        direction={1}
-                        scrollVelRef={scrollVelRef}
-                        rowId="row1"
-                    />
-                    <CarouselRow
-                        items={row2}
-                        direction={-1}
-                        scrollVelRef={scrollVelRef}
-                        rowId="row2"
-                    />
-                </div>
-
-                {/* Edge fades - aca deberian estar los orbs color negro*/}
-                <div
-                    className="absolute pointer-events-none z-20"
-                    style={{
-                        left: '-15%',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        width: '20%',
-                        height: '100%',
-                        borderRadius: '50%',
-                        background:
-                            'radial-gradient(circle, rgba(1,1,1,1) 0%, rgba(1,1,1,0.85) 40%, transparent 75%)',
-                        filter: 'blur(28px)',
-                    }}
+                <MarqueeRow
+                    items={track1}
+                    trackRef={row1.trackRef}
                 />
-
-                {/* Edge orbs - right */}
-                <div
-                    className="absolute pointer-events-none z-20"
-                    style={{
-                        right: '-15%',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        width: '20%',
-                        height: '100%',
-                        borderRadius: '50%',
-                        background:
-                            'radial-gradient(circle, rgba(1,1,1,1) 0%, rgba(1,1,1,0.85) 40%, transparent 75%)',
-                        filter: 'blur(28px)',
-                    }}
+                <MarqueeRow
+                    items={track2}
+                    trackRef={row2.trackRef}
                 />
             </section>
         </>
     )
 }
+
+export default TechStack

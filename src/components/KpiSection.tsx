@@ -24,6 +24,86 @@ const kpiItems = [
     },
 ]
 
+// ── useTitleShine ──────────────────────────────────────────────────────────────
+// Sweeps a #4260C5-tinted shine left→right every time the h1 enters the viewport.
+// Resets on leave so it fires again on the next scroll-in.
+function useTitleShine() {
+    const h1Ref = useRef<HTMLHeadingElement>(null)
+    const rafRef = useRef<number>(0)
+    const running = useRef(false)
+    const SPEED = 3.0
+
+    useEffect(() => {
+        const el = h1Ref.current
+        if (!el) return
+
+        const getOpacity = (pos: number) => {
+            if (pos < 0) return 0
+            if (pos < 12) return pos / 12
+            if (pos < 80) return 1
+            return Math.max(0, 1 - (pos - 80) / 40)
+        }
+
+        const runSweep = () => {
+            cancelAnimationFrame(rafRef.current)
+            running.current = true
+            let x = -20
+
+            const tick = () => {
+                x = Math.min(x + SPEED, 122)
+                const o = getOpacity(x)
+
+                el.style.backgroundImage = `linear-gradient(
+                    125deg,
+                    white                                    0%,
+                    white                                    ${x - 8}%,
+                    rgba(150,175,255,${(o * 0.4).toFixed(3)}) ${x - 4}%,
+                    rgba(100,140,255,${(o * 0.9).toFixed(3)}) ${x - 1}%,
+                    rgba(200,220,255,${o.toFixed(3)})           ${x}%,
+                    rgba(100,140,255,${(o * 0.8).toFixed(3)}) ${x + 3}%,
+                    rgba(66,96,197,  ${(o * 0.25).toFixed(3)}) ${x + 6}%,
+                    white                                    ${x + 10}%,
+                    white                                    100%
+                )`
+
+                if (x >= 122) {
+                    running.current = false
+                    el.style.backgroundImage =
+                        'linear-gradient(125deg, white 0%, white 100%)'
+                    return
+                }
+                rafRef.current = requestAnimationFrame(tick)
+            }
+
+            rafRef.current = requestAnimationFrame(tick)
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setTimeout(runSweep, 200)
+                } else {
+                    // salió del viewport → cancela y resetea para la próxima entrada
+                    cancelAnimationFrame(rafRef.current)
+                    running.current = false
+                    el.style.backgroundImage =
+                        'linear-gradient(125deg, white 0%, white 100%)'
+                }
+            },
+            { threshold: 0.5 },
+        )
+
+        observer.observe(el)
+
+        return () => {
+            observer.disconnect()
+            cancelAnimationFrame(rafRef.current)
+        }
+    }, [])
+
+    return h1Ref
+}
+
 // ── Counter ───────────────────────────────────────────────────────────────────
 function useCounter(target: number, duration = 1800, start = false) {
     const [value, setValue] = useState(0)
@@ -46,6 +126,7 @@ function useCounter(target: number, duration = 1800, start = false) {
     return value
 }
 
+// ── KpiCard ───────────────────────────────────────────────────────────────────
 function KpiCard({
     item,
     index,
@@ -69,16 +150,14 @@ function KpiCard({
     return (
         <div
             data-animate="up"
-            className="kpi-card relative flex items-center justify-center overflow-hidden rounded-3xl border border-white/5 bg-[#090909] p-6 sm:p-10 md:p-12 min-h-45 sm:min-h-62.5 md:min-h-67.5 transition-colors w-[60%] sm:w-full mx-auto "
+            className="kpi-card relative flex items-center justify-center overflow-hidden rounded-3xl border border-white/5 bg-[#090909] p-6 sm:p-10 md:p-12 min-h-45 sm:min-h-62.5 md:min-h-67.5 transition-colors w-[60%] sm:w-full mx-auto"
             style={{ animationDelay: `${550 + index * 120}ms` }}>
-            {/* Glow de color */}
             <div
                 className="pointer-events-none absolute inset-0 rounded-3xl"
                 style={{
                     background: `radial-gradient(ellipse 80% 60% at 50% 110%, ${color}18 0%, transparent 70%)`,
                 }}
             />
-            {/* Grid decorativo */}
             <div
                 className="pointer-events-none absolute inset-0 rounded-3xl"
                 style={{
@@ -87,14 +166,12 @@ function KpiCard({
                     backgroundSize: '50px 50px',
                 }}
             />
-            {/* Contenido */}
             <div className="relative z-10 flex flex-col items-center text-center gap-2">
                 <div className="relative">
                     <span className="block text-5xl sm:text-6xl md:text-7xl font-semibold text-white leading-none tabular-nums">
                         {count}
                         {item.suffix}
                     </span>
-                    {/* Fade overlay sobre el número */}
                     <div
                         className="absolute inset-x-0 bottom-0 pointer-events-none h-full"
                         style={{
@@ -102,7 +179,6 @@ function KpiCard({
                                 'linear-gradient(to bottom, rgba(9,9,9,0) 0%, rgba(9,9,9,0.85) 68%, #090909 100%)',
                         }}
                     />
-                    {/* Label de unidad superpuesto */}
                     <p className="absolute left-1/2 -translate-x-1/2 top-[80%] font-firacode text-sm sm:text-base md:text-lg font-semibold uppercase leading-none pointer-events-none text-white whitespace-nowrap">
                         {item.unit}
                     </p>
@@ -119,7 +195,9 @@ function KpiCard({
 export default function KpiSection() {
     const sectionRef = useRef<HTMLDivElement>(null)
     const [triggerCount, setTriggerCount] = useState(false)
+    const titleRef = useTitleShine()
 
+    // Animate-in observer for all [data-animate] elements
     useEffect(() => {
         const elements = sectionRef.current?.querySelectorAll('[data-animate]')
         if (!elements) return
@@ -144,6 +222,7 @@ export default function KpiSection() {
         return () => observer.disconnect()
     }, [])
 
+    // Counter trigger observer
     useEffect(() => {
         const section = sectionRef.current
         if (!section) return
@@ -171,10 +250,13 @@ export default function KpiSection() {
           from { opacity: 0; transform: translateY(50px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+
         [data-animate="left"],
         [data-animate="up"] { opacity: 0; }
+
         [data-animate="left"].animated {
           animation: slideFromLeft 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          animation-delay: var(--anim-delay, 0ms);
         }
         [data-animate="up"].animated {
           animation: slideFromBottom 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
@@ -184,6 +266,7 @@ export default function KpiSection() {
           opacity: 1;
           transform: translateY(0);
         }
+
         .kpi-card {
           transition: transform 1.50s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -201,30 +284,27 @@ export default function KpiSection() {
                 <div className="relative z-10 max-w-5xl mx-auto flex flex-col gap-10 sm:gap-12">
                     {/* Header */}
                     <div className="flex flex-col items-center gap-1 text-center">
-                        <div
-                            data-animate="left"
-                            className="font-jetbrains inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] mb-1 border border-[#6B7280] bg-black/10 text-[#9CA3AF]"
-                            style={{ animationDelay: '0ms' }}>
-                            Indicadores Clave
-                        </div>
                         <h1
+                            ref={titleRef}
                             data-animate="left"
-                            className="font-jetbrains text-3xl md:text-4xl font-bold text-white leading-[1.1]"
-                            style={{ animationDelay: '150ms' }}>
+                            className="font-jetbrains text-3xl md:text-4xl font-bold leading-[1.1]"
+                            style={{
+                                // CSS custom property picked up by the animation rule
+                                ['--anim-delay' as string]: '150ms',
+                                // backgroundClip must be set from render so
+                                // the rAF gradient changes take immediate effect
+                                backgroundImage:
+                                    'linear-gradient(125deg, white 0%, white 100%)',
+                                backgroundClip: 'text',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                            }}>
                             Impacto real en cada proyecto
                         </h1>
-                        <p
-                            data-animate="left"
-                            className="font-jetbrains text-sm text-[#4260C5] leading-snug"
-                            style={{ animationDelay: '300ms' }}>
-                            Ingeniería enfocada en rendimiento, calidad y evolución
-                            constante.
-                        </p>
                     </div>
 
-                    {/* Cards grid — 1 col en móvil, 3 en md+ */}
+                    {/* Cards grid */}
                     <div className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        {/* Glow de fondo */}
                         <div
                             className="pointer-events-none absolute left-1/2 -translate-x-1/2 z-0 w-[min(1900px,300vw)] h-225 blur-[50px]"
                             style={{

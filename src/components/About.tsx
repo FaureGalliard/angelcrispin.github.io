@@ -1,197 +1,336 @@
-import Image from 'next/image'
+'use client'
+import { useRef, useEffect } from 'react'
 
-// ─── Code Block Header ────────────────────────────────────────────────────────
-const CodeBlockHeader: React.FC<{ filename?: string }> = ({ filename }) => (
-    <div
-        className="flex items-center px-4 py-3 rounded-t-lg border-b"
-        style={{ backgroundColor: '#1a1a1a', borderColor: '#2a2a2a' }}>
-        <div className="flex gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-400" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
-        </div>
-        {filename && (
-            <span
-                className="ml-4 text-xs font-mono"
-                style={{ color: '#6b7280' }}>
-                {filename}
-            </span>
-        )}
-    </div>
-)
-
-// ─── Image Panel ──────────────────────────────────────────────────────────────
-const ImagePanel: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
-    <div className="relative overflow-hidden group">
-        <Image
-            src={src}
-            alt={alt}
-            width={800}
-            height={600}
-            priority
-            className="w-full h-auto object-cover   transform group-hover:scale-105 transition-all duration-500"
-        />
-    </div>
-)
-
-// ─── Technologies ─────────────────────────────────────────────────────────────
-const technologies = ['TypeScript', 'React', 'Node.js', 'Docker']
-
-// ─── AboutMe ──────────────────────────────────────────────────────────────────
 export default function AboutMe() {
+    const sectionRef = useRef<HTMLElement>(null)
+
+    useEffect(() => {
+        const el = sectionRef.current
+        if (!el) return
+        const elements = el.querySelectorAll<HTMLElement>('[data-animate]')
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target as HTMLElement
+                        target.classList.add('animated')
+                        target.addEventListener(
+                            'animationend',
+                            () => target.classList.add('done'),
+                            { once: true },
+                        )
+                        observer.unobserve(target)
+                    }
+                })
+            },
+            { threshold: 0.15 },
+        )
+        elements.forEach((e) => observer.observe(e))
+        return () => observer.disconnect()
+    }, [])
+
     return (
-        <section
-            id="about"
-            className="py-24 relative"
-            style={{ backgroundColor: '#0e0e0e' }}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                    {/* ── Image / Visual ── */}
-                    <div className="relative order-2 lg:order-1">
-                        {/* Available for hire badge */}
+        <>
+            <style>{`
+                @keyframes slideFromLeft {
+                    from { opacity: 0; transform: translateX(-50px); }
+                    to   { opacity: 1; transform: translateX(0); }
+                }
+                @keyframes slideFromRight {
+                    from { opacity: 0; transform: translateX(50px); }
+                    to   { opacity: 1; transform: translateX(0); }
+                }
+                @keyframes slideFromBottom {
+                    from { opacity: 0; transform: translateY(50px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+                [data-animate="left"],
+                [data-animate="right"],
+                [data-animate="up"] { opacity: 0; }
+                [data-animate="left"].animated {
+                    animation: slideFromLeft 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+                }
+                [data-animate="right"].animated {
+                    animation: slideFromRight 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+                }
+                [data-animate="up"].animated {
+                    animation: slideFromBottom 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+                }
+                [data-animate].animated.done {
+                    animation: none;
+                    opacity: 1;
+                    transform: none;
+                }
 
-                        {/* Code block container */}
+                .about-photo-wrapper {
+                    transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+                }
+                .about-photo-wrapper:hover {
+                    transform: scale(1.03) translateY(-6px);
+                }
+                .about-scan-line {
+                    position: absolute;
+                    left: 0; right: 0;
+                    height: 2px;
+                    background: linear-gradient(90deg, transparent, rgba(108,219,149,0.35), transparent);
+                    animation: scanLine 3.5s ease-in-out infinite;
+                    pointer-events: none;
+                }
+                @keyframes scanLine {
+                    0%   { top: 0%;    opacity: 0; }
+                    5%   { opacity: 1; }
+                    95%  { opacity: 1; }
+                    100% { top: 100%; opacity: 0; }
+                }
+
+                .about-cursor {
+                    display: inline-block;
+                    width: 2px;
+                    height: 1.1em;
+                    background: #4260C5;
+                    margin-left: 3px;
+                    vertical-align: text-bottom;
+                    animation: blink 1.1s step-end infinite;
+                }
+                @keyframes blink {
+                    0%, 100% { opacity: 1; }
+                    50%       { opacity: 0; }
+                }
+            `}</style>
+
+            <section
+                ref={sectionRef}
+                className="relative w-full bg-[#010101] py-24 px-4 sm:px-8 md:px-12 overflow-hidden">
+                {/* Background orbs — consistent with TechStack */}
+                <div
+                    className="absolute pointer-events-none"
+                    style={{
+                        left: '-5%',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: '45%',
+                        height: '130%',
+                        borderRadius: '50%',
+                        background:
+                            'radial-gradient(circle, rgba(66,96,197,0.09) 0%, transparent 70%)',
+                        filter: 'blur(50px)',
+                        zIndex: 0,
+                    }}
+                />
+                <div
+                    className="absolute pointer-events-none"
+                    style={{
+                        right: '-5%',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: '40%',
+                        height: '120%',
+                        borderRadius: '50%',
+                        background:
+                            'radial-gradient(circle, rgba(108,219,149,0.07) 0%, transparent 70%)',
+                        filter: 'blur(50px)',
+                        zIndex: 0,
+                    }}
+                />
+
+                <div className="relative z-10 max-w-5xl mx-auto flex flex-col gap-12">
+                    {/* Header */}
+                    <div className="flex flex-col items-center gap-1 text-center">
                         <div
-                            className="rounded-lg overflow-hidden shadow-2xl border"
-                            style={{ borderColor: '#2a2a2a' }}>
-                            <CodeBlockHeader filename="profile.img" />
-                            <ImagePanel
-                                src="https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg"
-                                alt="professional headshot of a software engineer, cinematic lighting, tech background, high quality photography"
-                            />
+                            data-animate="left"
+                            className="font-mono inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] mb-1 border border-gray-500 bg-black/10 text-gray-400 tracking-[0.06em] uppercase"
+                            style={{ animationDelay: '0ms' }}>
+                            Sobre Mí
                         </div>
-
-                        {/* Decorative corners */}
-
-                        {/* 5+ Years Experience badge */}
-                        <div
-                            className="absolute -bottom-6 -right-6 p-4 rounded-lg shadow-xl flex items-center gap-3 animate-bounce border"
-                            style={{
-                                backgroundColor: '#1a1a1a',
-                                borderColor: '#2a2a2a',
-                                animationDuration: '3s',
-                            }}>
-                            <div
-                                className="p-2 rounded-full"
-                                style={{ backgroundColor: 'rgba(77, 253, 180, 0.2)' }}>
-                                <svg
-                                    className="w-4 h-4"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 448 512"
-                                    fill="#4dfdb4">
-                                    <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div
-                                    className="text-xs"
-                                    style={{ color: '#6b7280' }}>
-                                    Years Experience
-                                </div>
-                                <div className="text-lg font-bold text-white">
-                                    5+ Years
-                                </div>
-                            </div>
-                        </div>
+                        <h2
+                            data-animate="left"
+                            className="font-mono text-[1.75rem] font-bold text-white m-0 leading-none"
+                            style={{ animationDelay: '150ms' }}>
+                            ¿Quién soy?
+                        </h2>
+                        <p
+                            data-animate="left"
+                            className="font-mono text-sm m-0"
+                            style={{ animationDelay: '300ms', color: '#4260C5' }}>
+                            Código, arquitectura y propósito.
+                        </p>
                     </div>
 
-                    {/* ── Content ── */}
-                    <div className="font-firacode order-1 lg:order-2 flex flex-col justify-center">
-                        {/* Heading */}
-                        <div className="flex items-center gap-4 mb-6">
-                            <h2 className="font-jetbrains text-3xl font-bold text-white">
-                                Sobre Mi
-                            </h2>
-                            <div
-                                className="h-px grow ml-4"
-                                style={{ backgroundColor: '#2a2a2a' }}
-                            />
-                        </div>
-
-                        {/* Bio */}
+                    {/* Main content — text left, photo right */}
+                    <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+                        {/* Left — text card */}
                         <div
-                            className="text-sm space-y-6 leading-relaxed"
-                            style={{ color: '#6b7280' }}>
-                            <p>
-                                Hola, soy{' '}
-                                <span
-                                    className="font-semibold"
-                                    style={{ color: '#4d9fff' }}>
-                                    Ángel Gabriel Crispín Valdivia
-                                </span>
-                                . Me especializo en{' '}
-                                <span
-                                    className="font-medium"
-                                    style={{ color: '#4d9fff' }}>
-                                    desarrollo backend, APIs REST y automatización de
-                                    procesos
-                                </span>
-                                . Mi enfoque está en construir sistemas eficientes que
-                                conecten plataformas, reduzcan tareas manuales y mejoren
-                                la trazabilidad de los procesos comerciales y operativos.
-                            </p>
-                            <p>
-                                He trabajado en el sector tecnológico y corporativo
-                                desarrollando{' '}
-                                <span
-                                    className="font-medium"
-                                    style={{ color: '#4d9fff' }}>
-                                    integraciones entre formularios web, CRM y
-                                    herramientas de automatización
-                                </span>
-                                , optimizando consultas SQL y diseñando flujos que han
-                                logrado reducir tareas manuales hasta en un{' '}
-                                <span
-                                    className="font-semibold"
-                                    style={{ color: '#4d9fff' }}>
-                                    35%
-                                </span>
-                                . Mi experiencia incluye el desarrollo y mantenimiento de
-                                servicios backend escalables en entornos productivos.
-                            </p>
-                            <p>
-                                Actualmente continúo fortaleciendo mi perfil en{' '}
-                                <span
-                                    className="font-medium"
-                                    style={{ color: '#4d9fff' }}>
-                                    arquitectura de sistemas, bases de datos y
-                                    automatización avanzada
-                                </span>
-                                , combinando mi formación en Ingeniería de Software y
-                                Estadística para diseñar soluciones técnicas con impacto
-                                real en el negocio.
-                            </p>
+                            data-animate="left"
+                            className="flex-1 w-full"
+                            style={{ animationDelay: '400ms' }}>
+                            <div
+                                className="relative overflow-hidden rounded-2xl border border-white/5 p-8 sm:p-10"
+                                style={{ backgroundColor: '#090909' }}>
+                                {/* Decorative grid */}
+                                <div
+                                    className="absolute inset-0 pointer-events-none rounded-2xl"
+                                    style={{
+                                        backgroundImage:
+                                            'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
+                                        backgroundSize: '32px 32px',
+                                    }}
+                                />
+                                {/* Bottom glow */}
+                                <div
+                                    className="absolute inset-0 pointer-events-none rounded-2xl"
+                                    style={{
+                                        background:
+                                            'radial-gradient(ellipse 80% 55% at 50% 110%, rgba(66,96,197,0.12) 0%, transparent 70%)',
+                                    }}
+                                />
+
+                                {/* Terminal prompt line */}
+                                <div className="relative z-10 flex items-center gap-2 mb-6">
+                                    <span className="font-mono text-[#6CDB95] text-xs select-none">
+                                        ❯
+                                    </span>
+                                    <span className="font-mono text-[#4260C5] text-xs tracking-widest uppercase select-none">
+                                        about.txt
+                                    </span>
+                                </div>
+
+                                {/* Text */}
+                                <div className="relative z-10 flex flex-col gap-5">
+                                    <p className="font-mono text-[0.95rem] leading-relaxed text-white/80">
+                                        Me interesa construir software que sea{' '}
+                                        <span style={{ color: '#6CDB95' }}>rápido</span>,{' '}
+                                        <span style={{ color: '#F8DA63' }}>robusto</span>{' '}
+                                        y{' '}
+                                        <span style={{ color: '#E46F6F' }}>
+                                            bien diseñado
+                                        </span>
+                                        .
+                                    </p>
+                                    <p className="font-mono text-[0.85rem] leading-relaxed text-white/45">
+                                        Disfruto trabajar desde la arquitectura hasta la
+                                        implementación, buscando siempre soluciones
+                                        simples para problemas complejos.
+                                        <span className="about-cursor" />
+                                    </p>
+                                </div>
+
+                                {/* Bottom divider with accent */}
+                                <div
+                                    className="relative z-10 mt-8 h-px w-full"
+                                    style={{
+                                        background:
+                                            'linear-gradient(90deg, #4260C522, #6CDB9533, transparent)',
+                                    }}
+                                />
+                                <div className="relative z-10 mt-4 flex items-center gap-2">
+                                    <span className="font-mono text-[10px] text-white/20 tracking-widest uppercase">
+                                        Angel Crispin
+                                    </span>
+                                    <span className="font-mono text-[10px] text-white/10">
+                                        ·
+                                    </span>
+                                    <span className="font-mono text-[10px] text-white/20 tracking-widest uppercase">
+                                        Lima, Perú
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Technologies */}
-                        <div className="mt-8">
-                            <h3 className="text-white font-mono text-sm mb-4">
-                                Tecnologias con la que he trabajado recientemente:
-                            </h3>
-                            <ul
-                                className="grid grid-cols-2 gap-2 font-mono text-sm"
-                                style={{ color: '#6b7280' }}>
-                                {technologies.map((tech) => (
-                                    <li
-                                        key={tech}
-                                        className="flex items-center gap-2">
+                        {/* Right — photo */}
+                        <div
+                            data-animate="right"
+                            className="flex-shrink-0 flex justify-center"
+                            style={{ animationDelay: '500ms' }}>
+                            <div
+                                className="about-photo-wrapper relative rounded-2xl overflow-hidden"
+                                style={{
+                                    width: 260,
+                                    height: 320,
+                                    border: '1px solid #1a1a1a',
+                                    boxShadow:
+                                        '0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(66,96,197,0.08)',
+                                    backgroundColor: '#090909',
+                                }}>
+                                {/* Grid bg inside photo */}
+                                <div
+                                    className="absolute inset-0 pointer-events-none"
+                                    style={{
+                                        backgroundImage:
+                                            'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
+                                        backgroundSize: '24px 24px',
+                                    }}
+                                />
+
+                                {/* Placeholder avatar */}
+                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                                    <div
+                                        className="rounded-full flex items-center justify-center"
+                                        style={{
+                                            width: 80,
+                                            height: 80,
+                                            background:
+                                                'linear-gradient(135deg, #4260C522, #6CDB9522)',
+                                            border: '1px solid #4260C533',
+                                        }}>
                                         <svg
-                                            className="w-2 h-3 shrink-0"
-                                            aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 256 512"
-                                            fill="#4d9fff">
-                                            <path d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z" />
+                                            width="36"
+                                            height="36"
+                                            viewBox="0 0 24 24"
+                                            fill="none">
+                                            <circle
+                                                cx="12"
+                                                cy="8"
+                                                r="4"
+                                                stroke="#4260C5"
+                                                strokeWidth="1.5"
+                                            />
+                                            <path
+                                                d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
+                                                stroke="#4260C5"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                            />
                                         </svg>
-                                        {tech}
-                                    </li>
-                                ))}
-                            </ul>
+                                    </div>
+                                    <span className="font-mono text-[10px] text-white/20 tracking-widest uppercase">
+                                        tu foto aquí
+                                    </span>
+                                </div>
+
+                                {/* Scan line animation */}
+                                <div className="about-scan-line" />
+
+                                {/* Bottom color glow */}
+                                <div
+                                    className="absolute inset-0 pointer-events-none"
+                                    style={{
+                                        background:
+                                            'radial-gradient(ellipse 80% 45% at 50% 110%, rgba(66,96,197,0.18) 0%, transparent 70%)',
+                                    }}
+                                />
+
+                                {/* Corner accents */}
+                                <div
+                                    className="absolute top-3 left-3 w-4 h-4 border-t border-l"
+                                    style={{ borderColor: '#4260C544' }}
+                                />
+                                <div
+                                    className="absolute top-3 right-3 w-4 h-4 border-t border-r"
+                                    style={{ borderColor: '#4260C544' }}
+                                />
+                                <div
+                                    className="absolute bottom-3 left-3 w-4 h-4 border-b border-l"
+                                    style={{ borderColor: '#6CDB9544' }}
+                                />
+                                <div
+                                    className="absolute bottom-3 right-3 w-4 h-4 border-b border-r"
+                                    style={{ borderColor: '#6CDB9544' }}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </>
     )
 }
