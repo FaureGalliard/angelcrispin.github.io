@@ -116,7 +116,7 @@ function MarqueeRow({
     animationClass,
 }: {
     items: TechItem[]
-    trackRef: React.RefObject<HTMLDivElement>
+    trackRef: React.RefObject<HTMLDivElement | null>
     animationClass?: string
 }) {
     const [hoveredId, setHoveredId] = useState<number | null>(null)
