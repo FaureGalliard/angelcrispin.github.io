@@ -366,7 +366,7 @@ const TechStack: React.FC = () => {
     border: 1px solid transparent; cursor: default;
     transition:
         opacity 0.3s ease,
-        transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
         box-shadow 0.35s ease,
         border-color 0.3s ease;
     overflow: hidden;
@@ -425,25 +425,12 @@ const TechStack: React.FC = () => {
                 <div className="orb orb-right" />
 
                 <div className="stack-header">
-                    <div
-                        data-animate="left"
-                        className="stack-badge"
-                        style={{ animationDelay: '0ms' }}>
-                        Stack Tecnológico
-                    </div>
                     <h2
                         data-animate="left"
                         className="stack-title"
                         style={{ animationDelay: '150ms' }}>
                         Codea, Construye, Repite
                     </h2>
-                    <p
-                        data-animate="left"
-                        className="stack-subtitle"
-                        style={{ animationDelay: '300ms' }}>
-                        Una vista a las tecnologías que utilizo para crear software de
-                        alta calidad.
-                    </p>
                 </div>
 
                 <MarqueeRow
