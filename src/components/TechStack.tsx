@@ -1,6 +1,5 @@
 'use client'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-
 const ROW_1 = [
     { name: 'Python', icon: 'devicon-python-plain', color: '#3776AB' },
     { name: 'C++', icon: 'devicon-cplusplus-plain', color: '#00599C' },
@@ -25,13 +24,11 @@ const ROW_2 = [
     { name: 'Tailwind CSS', icon: 'devicon-tailwindcss-plain', color: '#06B6D4' },
     { name: 'React', icon: 'devicon-react-original', color: '#61DAFB' },
 ]
-
 interface TechItem {
     name: string
     icon: string
     color: string
 }
-
 const TechCard: React.FC<{
     item: TechItem
     isHovered: boolean
@@ -40,21 +37,20 @@ const TechCard: React.FC<{
     onLeave: () => void
 }> = ({ item, isHovered, anyHovered, onEnter, onLeave }) => (
     <div
-        className="tech-card"
+        className={`tech-card${isHovered ? ' tech-card--hovered' : ''}`}
         onMouseEnter={onEnter}
         onMouseLeave={onLeave}
         style={{
-            opacity: anyHovered && !isHovered ? 0.12 : 1,
+            opacity: anyHovered && !isHovered ? 0.4 : 1,
             transform: isHovered
                 ? 'scale(1.02) translateY(-4px)'
                 : 'scale(1) translateY(0)',
-            borderColor: isHovered ? `${item.color}33` : 'transparent',
-            boxShadow: isHovered
-                ? `0 18px 40px rgba(0,0,0,0.7), 0 0 24px ${item.color}25`
-                : 'none',
+            // ── removed box-shadow glow ──
             zIndex: isHovered ? 20 : 1,
             ['--glow-color' as string]: item.color,
             ['--glow-opacity' as string]: isHovered ? '0.18' : '0.07',
+            // Pass icon color so ::before can use it via CSS var
+            ['--icon-color' as string]: item.color,
         }}>
         <div className="tech-card-glow" />
         <i
@@ -71,17 +67,14 @@ const TechCard: React.FC<{
         </span>
     </div>
 )
-
 const BASE_SPEED = 80
 const SCROLL_RATIO = 0.5
-
 function useMarqueeRow(invertScroll = false) {
     const trackRef = useRef<HTMLDivElement>(null)
     const reverseRef = useRef(invertScroll)
     const posRef = useRef(0)
     const rafRef = useRef<number>(0)
     const lastTime = useRef<number>(0)
-
     useEffect(() => {
         const trackEl = trackRef.current
         if (!trackEl) return
@@ -106,24 +99,26 @@ function useMarqueeRow(invertScroll = false) {
         rafRef.current = requestAnimationFrame(animate)
         return () => cancelAnimationFrame(rafRef.current)
     }, [])
-
     return { trackRef, reverseRef, posRef }
 }
-
 function MarqueeRow({
     items,
     trackRef,
     animationClass,
+    hoveredKey,
+    onEnter,
+    onLeave,
+    rowPrefix,
 }: {
     items: TechItem[]
     trackRef: React.RefObject<HTMLDivElement | null>
     animationClass?: string
+    hoveredKey: string | null
+    onEnter: (key: string) => void
+    onLeave: () => void
+    rowPrefix: string
 }) {
-    const [hoveredId, setHoveredId] = useState<number | null>(null)
-    const enter = useCallback((i: number) => setHoveredId(i), [])
-    const leave = useCallback(() => setHoveredId(null), [])
-    const anyHovered = hoveredId !== null
-
+    const anyHovered = hoveredKey !== null
     return (
         <div className={`marquee-row ${animationClass ?? ''}`}>
             <div className="marquee-fade marquee-fade-left" />
@@ -131,31 +126,34 @@ function MarqueeRow({
             <div
                 ref={trackRef}
                 className="marquee-track">
-                {items.map((item, i) => (
-                    <TechCard
-                        key={i}
-                        item={item}
-                        isHovered={hoveredId === i}
-                        anyHovered={anyHovered}
-                        onEnter={() => enter(i)}
-                        onLeave={leave}
-                    />
-                ))}
+                {items.map((item, i) => {
+                    const key = `${rowPrefix}-${i}`
+                    return (
+                        <TechCard
+                            key={i}
+                            item={item}
+                            isHovered={hoveredKey === key}
+                            anyHovered={anyHovered}
+                            onEnter={() => onEnter(key)}
+                            onLeave={onLeave}
+                        />
+                    )
+                })}
             </div>
         </div>
     )
 }
-
 const TechStack: React.FC = () => {
     const wrapperRef = useRef<HTMLElement>(null)
     const [rowsVisible, setRowsVisible] = useState(false)
+    const [hoveredKey, setHoveredKey] = useState<string | null>(null)
+    const onEnter = useCallback((key: string) => setHoveredKey(key), [])
+    const onLeave = useCallback(() => setHoveredKey(null), [])
     const track1 = [...ROW_1, ...ROW_1]
     const track2 = [...ROW_2, ...ROW_2]
     const row1 = useMarqueeRow(false)
     const row2 = useMarqueeRow(true)
     const lastScrollY = useRef(typeof window !== 'undefined' ? window.scrollY : 0)
-
-    // Trigger carousel entry animation when section enters viewport
     useEffect(() => {
         const el = wrapperRef.current
         if (!el) return
@@ -171,7 +169,6 @@ const TechStack: React.FC = () => {
         observer.observe(el)
         return () => observer.disconnect()
     }, [])
-
     useEffect(() => {
         const track1El = row1.trackRef.current
         const track2El = row2.trackRef.current
@@ -205,7 +202,6 @@ const TechStack: React.FC = () => {
         window.addEventListener('scroll', onScroll, { passive: true })
         return () => window.removeEventListener('scroll', onScroll)
     }, [])
-
     useEffect(() => {
         const el = wrapperRef.current
         if (!el) return
@@ -230,13 +226,10 @@ const TechStack: React.FC = () => {
         elements.forEach((e) => observer.observe(e))
         return () => observer.disconnect()
     }, [])
-
     return (
         <>
             <style>{`
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
-
-/* ── Existing header animations ── */
 @keyframes slideFromLeft {
     from { opacity: 0; transform: translateX(-50px); }
     to   { opacity: 1; transform: translateX(0); }
@@ -248,28 +241,16 @@ const TechStack: React.FC = () => {
 [data-animate="left"].animated.done {
     animation: none; opacity: 1; transform: none;
 }
-
-/* ── Carousel entry animations ── */
-
 @keyframes rowFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(32px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
-
-/* Default state: invisible until triggered */
 .marquee-row {
     opacity: 0;
     position: relative;
     z-index: 10;
     overflow: visible;
 }
-
 .marquee-row.row-1.visible {
     animation: rowFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0ms;
@@ -278,31 +259,19 @@ const TechStack: React.FC = () => {
     animation: rowFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 120ms;
 }
-
 .marquee-row.row-1.visible.done,
 .marquee-row.row-2.visible.done {
-    animation: none;
-    opacity: 1;
-    transform: none;
+    animation: none; opacity: 1; transform: none;
 }
-
 /* ── Layout ── */
 .marquee-section {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    background: #000;
-    padding: 5rem 0 3rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
+    position: relative; width: 100%; overflow: hidden;
+    background: #000; padding: 5rem 0 3rem;
+    display: flex; flex-direction: column; gap: 0.1rem;
 }
 .orb {
-    position: absolute;
-    pointer-events: none;
-    border-radius: 50%;
-    filter: blur(40px);
-    z-index: 1;
+    position: absolute; pointer-events: none;
+    border-radius: 50%; filter: blur(40px); z-index: 1;
 }
 .orb-left {
     left: -10%; top: 50%; transform: translateY(-50%);
@@ -321,7 +290,6 @@ const TechStack: React.FC = () => {
     background: radial-gradient(circle, rgba(228,111,111,0.12) 0%, transparent 70%);
     filter: blur(42px);
 }
-
 /* Header */
 .stack-header {
     position: relative; z-index: 10;
@@ -347,15 +315,13 @@ const TechStack: React.FC = () => {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.875rem; margin: 0; color: #4260C5;
 }
-
 /* Marquee track */
 .marquee-track {
     display: flex; align-items: center;
     width: max-content; will-change: transform;
     padding: 2px 0;
 }
-
-/* Cards */
+/* ── Cards ── */
 .tech-card {
     position: relative;
     display: flex; align-items: center; justify-content: center;
@@ -366,19 +332,40 @@ const TechStack: React.FC = () => {
     border: 1px solid transparent; cursor: default;
     transition:
         opacity 0.3s ease,
-        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-        box-shadow 0.35s ease,
-        border-color 0.3s ease;
+        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     overflow: hidden;
 }
+/*
+  Default border: neutral #404040 corners
+  On hover (.tech-card--hovered): corners switch to --icon-color
+  No box-shadow / glow at all.
+*/
 .tech-card::before {
     content: "";
     position: absolute; inset: 0; border-radius: 1px;
     padding: 1px;
-    background: linear-gradient(175deg, #FFFFFF1A, transparent 18%, transparent 85%, #FFFFFF1A);
+    background: linear-gradient(
+        175deg,
+        #FFFFFF1A,
+        transparent 18%,
+        transparent 85%,
+        #FFFFFF1A
+    );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
     pointer-events: none; z-index: 1;
+    transition: background 0.3s ease;
+}
+/* Swap the neutral #404040 for the icon color on hover */
+.tech-card--hovered::before {
+    background: linear-gradient(
+        175deg,
+        var(--icon-color, #404040),
+        transparent 18%,
+        transparent 85%,
+        var(--icon-color, #404040)
+    );
 }
 .tech-card-glow {
     position: absolute; inset: 0; pointer-events: none;
@@ -401,7 +388,6 @@ const TechStack: React.FC = () => {
     font-size: .72rem;
     transition: color 0.25s ease; white-space: nowrap;
 }
-
 /* Fade edges */
 .marquee-fade {
     position: absolute; top: 0; bottom: 0;
@@ -416,14 +402,12 @@ const TechStack: React.FC = () => {
     background: linear-gradient(to left, #000 0%, transparent 100%);
 }
 `}</style>
-
             <section
                 ref={wrapperRef}
                 className="marquee-section">
-                <div className="orb orb-left" />
-                <div className="orb orb-center" />
-                <div className="orb orb-right" />
-
+                <div className="orb orb-left"></div>
+                <div className="orb orb-center"></div>
+                <div className="orb orb-right"></div>
                 <div className="stack-header">
                     <h2
                         data-animate="left"
@@ -432,20 +416,26 @@ const TechStack: React.FC = () => {
                         Codea, Construye, Repite
                     </h2>
                 </div>
-
                 <MarqueeRow
                     items={track1}
                     trackRef={row1.trackRef}
                     animationClass={`row-1${rowsVisible ? ' visible' : ''}`}
+                    hoveredKey={hoveredKey}
+                    onEnter={onEnter}
+                    onLeave={onLeave}
+                    rowPrefix="r1"
                 />
                 <MarqueeRow
                     items={track2}
                     trackRef={row2.trackRef}
                     animationClass={`row-2${rowsVisible ? ' visible' : ''}`}
+                    hoveredKey={hoveredKey}
+                    onEnter={onEnter}
+                    onLeave={onLeave}
+                    rowPrefix="r2"
                 />
             </section>
         </>
     )
 }
-
 export default TechStack

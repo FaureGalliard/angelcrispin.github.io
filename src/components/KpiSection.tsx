@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 
 const unitColors = ['#6CDB95', '#F8DA63', '#E46F6F']
 
@@ -25,8 +26,6 @@ const kpiItems = [
 ]
 
 // ── useTitleShine ──────────────────────────────────────────────────────────────
-// Sweeps a #4260C5-tinted shine left→right every time the h1 enters the viewport.
-// Resets on leave so it fires again on the next scroll-in.
 function useTitleShine() {
     const h1Ref = useRef<HTMLHeadingElement>(null)
     const rafRef = useRef<number>(0)
@@ -83,7 +82,6 @@ function useTitleShine() {
                 if (entry.isIntersecting) {
                     setTimeout(runSweep, 200)
                 } else {
-                    // salió del viewport → cancela y resetea para la próxima entrada
                     cancelAnimationFrame(rafRef.current)
                     running.current = false
                     el.style.backgroundImage =
@@ -104,26 +102,39 @@ function useTitleShine() {
     return h1Ref
 }
 
-// ── Counter ───────────────────────────────────────────────────────────────────
-function useCounter(target: number, duration = 1800, start = false) {
-    const [value, setValue] = useState(0)
-    const rafRef = useRef<number>(0)
+// ── AnimatedNumber ─────────────────────────────────────────────────────────────
+function AnimatedNumber({
+    value,
+    duration = 1.2,
+    start = false,
+    delay = 0,
+}: {
+    value: number
+    duration?: number
+    start?: boolean
+    delay?: number
+}) {
+    const motionVal = useMotionValue(0)
+    const rounded = useTransform(motionVal, (v) => Math.round(v))
+    const [display, setDisplay] = useState(0)
+
+    useEffect(() => {
+        const unsub = rounded.on('change', (v) => setDisplay(v))
+        return unsub
+    }, [rounded])
 
     useEffect(() => {
         if (!start) return
-        const startTime = performance.now()
-        const tick = (now: number) => {
-            const elapsed = now - startTime
-            const progress = Math.min(elapsed / duration, 1)
-            const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
-            setValue(Math.floor(eased * target))
-            if (progress < 1) rafRef.current = requestAnimationFrame(tick)
-        }
-        rafRef.current = requestAnimationFrame(tick)
-        return () => cancelAnimationFrame(rafRef.current)
-    }, [start, target, duration])
+        const timeout = setTimeout(() => {
+            animate(motionVal, value, {
+                duration,
+                ease: [0.25, 0.46, 0.45, 0.94],
+            })
+        }, delay)
+        return () => clearTimeout(timeout)
+    }, [start, value, duration, delay, motionVal])
 
-    return value
+    return <>{display}</>
 }
 
 // ── KpiCard ───────────────────────────────────────────────────────────────────
@@ -136,21 +147,12 @@ function KpiCard({
     index: number
     triggerCount: boolean
 }) {
-    const [started, setStarted] = useState(false)
-    const count = useCounter(item.number, 1600 + index * 150, started)
     const color = unitColors[index]
-
-    useEffect(() => {
-        if (triggerCount && !started) {
-            const t = setTimeout(() => setStarted(true), index * 120)
-            return () => clearTimeout(t)
-        }
-    }, [triggerCount, started, index])
 
     return (
         <div
             data-animate="up"
-            className="kpi-card relative flex items-center justify-center overflow-hidden rounded-3xl border border-white/5 bg-[#090909] p-6 sm:p-10 md:p-12 min-h-45 sm:min-h-62.5 md:min-h-67.5 transition-colors w-[60%] sm:w-full mx-auto"
+            className="kpi-card relative flex items-center justify-center rounded-3xl border border-white/5 bg-[#090909] p-6 sm:p-10 md:p-12 min-h-45 sm:min-h-62.5 md:min-h-67.5 w-[60%] sm:w-full mx-auto"
             style={{ animationDelay: `${550 + index * 120}ms` }}>
             <div
                 className="pointer-events-none absolute inset-0 rounded-3xl"
@@ -158,27 +160,42 @@ function KpiCard({
                     background: `radial-gradient(ellipse 80% 60% at 50% 110%, ${color}18 0%, transparent 70%)`,
                 }}
             />
+            {/* amplified glow — fades in on hover via .kpi-glow */}
+            <div
+                className="kpi-glow pointer-events-none absolute inset-0 rounded-3xl"
+                style={{
+                    background: `radial-gradient(ellipse 110% 90% at 50% 105%, ${color}60 0%, ${color}28 40%, transparent 68%)`,
+                }}
+            />
             <div
                 className="pointer-events-none absolute inset-0 rounded-3xl"
                 style={{
                     backgroundImage:
-                        'linear-gradient(rgba(255,255,255,0.04) 1.2px, transparent 1.2px), linear-gradient(90deg, rgba(255,255,255,0.04) 1.2px, transparent 1.2px)',
+                        'linear-gradient(rgba(255,255,255,0.01) 1.2px, transparent 1.2px), linear-gradient(90deg, rgba(255,255,255,0.04) 1.2px, transparent 1.2px)',
                     backgroundSize: '50px 50px',
                 }}
             />
             <div className="relative z-10 flex flex-col items-center text-center gap-2">
                 <div className="relative">
-                    <span className="block text-5xl sm:text-6xl md:text-7xl font-semibold text-white leading-none tabular-nums">
-                        {count}
+                    <span
+                        className="block text-5xl sm:text-6xl md:text-7xl font-semibold text-white leading-none tabular-nums"
+                        style={{
+                            WebkitMaskImage:
+                                'linear-gradient(to bottom, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 90%)',
+                            WebkitMaskRepeat: 'no-repeat',
+                            WebkitMaskSize: '100% 100%',
+                            maskImage:
+                                'linear-gradient(to bottom, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0) 90%)',
+                            maskRepeat: 'no-repeat',
+                            maskSize: '100% 100%',
+                        }}>
+                        <AnimatedNumber
+                            value={item.number}
+                            start={triggerCount}
+                            delay={index * 120}
+                        />
                         {item.suffix}
                     </span>
-                    <div
-                        className="absolute inset-x-0 bottom-0 pointer-events-none h-full"
-                        style={{
-                            background:
-                                'linear-gradient(to bottom, rgba(9,9,9,0) 0%, rgba(9,9,9,0.85) 68%, #090909 100%)',
-                        }}
-                    />
                     <p className="absolute left-1/2 -translate-x-1/2 top-[80%] font-firacode text-sm sm:text-base md:text-lg font-semibold uppercase leading-none pointer-events-none text-white whitespace-nowrap">
                         {item.unit}
                     </p>
@@ -197,7 +214,6 @@ export default function KpiSection() {
     const [triggerCount, setTriggerCount] = useState(false)
     const titleRef = useTitleShine()
 
-    // Animate-in observer for all [data-animate] elements
     useEffect(() => {
         const elements = sectionRef.current?.querySelectorAll('[data-animate]')
         if (!elements) return
@@ -222,7 +238,6 @@ export default function KpiSection() {
         return () => observer.disconnect()
     }, [])
 
-    // Counter trigger observer
     useEffect(() => {
         const section = sectionRef.current
         if (!section) return
@@ -261,38 +276,49 @@ export default function KpiSection() {
         [data-animate="up"].animated {
           animation: slideFromBottom 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
+
+        /* Once the entry animation ends, lock state and enable hover */
         [data-animate="up"].animated.done {
           animation: none;
           opacity: 1;
           transform: translateY(0);
         }
 
-        .kpi-card {
-          transition: transform 1.50s cubic-bezier(0.34, 1.56, 0.64, 1);
+        /* ── Hover ── */
+        .kpi-card.animated:not(.done) {
+          transition: none;
+        }
+        .kpi-card.done {
+          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                      box-shadow 0.4s ease;
         }
         .kpi-card.done:hover {
-          transform: scale(1.04) translateY(-10px);
+          transform: scale(1.08) translateY(-14px);
+          box-shadow: 0 32px 64px rgba(0, 0, 0, 0.6);
+        }
+        /* Glow layer brightens on hover */
+        .kpi-card .kpi-glow {
+          transition: opacity 0.4s ease;
+          opacity: 0;
+        }
+        .kpi-card.done:hover .kpi-glow {
+          opacity: 0.2;
         }
       `}</style>
 
             <section
                 ref={sectionRef}
                 className="relative w-full bg-[#010101] py-16 sm:py-20 md:py-24 px-4 sm:px-8 md:px-12 overflow-hidden">
-                {/* Transición Hero → KPI */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-30 bg-linear-to-b from-[#080808] to-[#010101]" />
 
                 <div className="relative z-10 max-w-5xl mx-auto flex flex-col gap-10 sm:gap-12">
-                    {/* Header */}
                     <div className="flex flex-col items-center gap-1 text-center">
                         <h1
                             ref={titleRef}
                             data-animate="left"
                             className="font-jetbrains text-3xl md:text-4xl font-bold leading-[1.1]"
                             style={{
-                                // CSS custom property picked up by the animation rule
                                 ['--anim-delay' as string]: '150ms',
-                                // backgroundClip must be set from render so
-                                // the rAF gradient changes take immediate effect
                                 backgroundImage:
                                     'linear-gradient(125deg, white 0%, white 100%)',
                                 backgroundClip: 'text',
@@ -303,7 +329,6 @@ export default function KpiSection() {
                         </h1>
                     </div>
 
-                    {/* Cards grid */}
                     <div className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         <div
                             className="pointer-events-none absolute left-1/2 -translate-x-1/2 z-0 w-[min(1900px,300vw)] h-225 blur-[50px]"
