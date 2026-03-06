@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
+
 const ROW_1 = [
     { name: 'Python', icon: 'devicon-python-plain', color: '#3776AB' },
     { name: 'C++', icon: 'devicon-cplusplus-plain', color: '#00599C' },
@@ -24,11 +25,13 @@ const ROW_2 = [
     { name: 'Tailwind CSS', icon: 'devicon-tailwindcss-plain', color: '#06B6D4' },
     { name: 'React', icon: 'devicon-react-original', color: '#61DAFB' },
 ]
+
 interface TechItem {
     name: string
     icon: string
     color: string
 }
+
 const TechCard: React.FC<{
     item: TechItem
     isHovered: boolean
@@ -45,11 +48,9 @@ const TechCard: React.FC<{
             transform: isHovered
                 ? 'scale(1.02) translateY(-4px)'
                 : 'scale(1) translateY(0)',
-            // ── removed box-shadow glow ──
             zIndex: isHovered ? 20 : 1,
             ['--glow-color' as string]: item.color,
             ['--glow-opacity' as string]: isHovered ? '0.18' : '0.07',
-            // Pass icon color so ::before can use it via CSS var
             ['--icon-color' as string]: item.color,
         }}>
         <div className="tech-card-glow" />
@@ -67,14 +68,17 @@ const TechCard: React.FC<{
         </span>
     </div>
 )
+
 const BASE_SPEED = 80
 const SCROLL_RATIO = 0.5
+
 function useMarqueeRow(invertScroll = false) {
     const trackRef = useRef<HTMLDivElement>(null)
     const reverseRef = useRef(invertScroll)
     const posRef = useRef(0)
     const rafRef = useRef<number>(0)
     const lastTime = useRef<number>(0)
+
     useEffect(() => {
         const trackEl = trackRef.current
         if (!trackEl) return
@@ -99,8 +103,10 @@ function useMarqueeRow(invertScroll = false) {
         rafRef.current = requestAnimationFrame(animate)
         return () => cancelAnimationFrame(rafRef.current)
     }, [])
+
     return { trackRef, reverseRef, posRef }
 }
+
 function MarqueeRow({
     items,
     trackRef,
@@ -143,32 +149,37 @@ function MarqueeRow({
         </div>
     )
 }
+
 const TechStack: React.FC = () => {
     const wrapperRef = useRef<HTMLElement>(null)
     const [rowsVisible, setRowsVisible] = useState(false)
     const [hoveredKey, setHoveredKey] = useState<string | null>(null)
     const onEnter = useCallback((key: string) => setHoveredKey(key), [])
     const onLeave = useCallback(() => setHoveredKey(null), [])
+
     const track1 = [...ROW_1, ...ROW_1]
     const track2 = [...ROW_2, ...ROW_2]
+
     const row1 = useMarqueeRow(false)
     const row2 = useMarqueeRow(true)
+
     const lastScrollY = useRef(typeof window !== 'undefined' ? window.scrollY : 0)
+
+    // ── 1. Rows visible: se activa y desactiva cada vez que entra/sale ──
     useEffect(() => {
         const el = wrapperRef.current
         if (!el) return
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry.isIntersecting) {
-                    setRowsVisible(true)
-                    observer.disconnect()
-                }
+                setRowsVisible(entry.isIntersecting) // ← true/false en cada cruce
             },
             { threshold: 0.15 },
         )
         observer.observe(el)
         return () => observer.disconnect()
     }, [])
+
+    // ── 2. Scroll-driven marquee direction ──
     useEffect(() => {
         const track1El = row1.trackRef.current
         const track2El = row2.trackRef.current
@@ -202,6 +213,8 @@ const TechStack: React.FC = () => {
         window.addEventListener('scroll', onScroll, { passive: true })
         return () => window.removeEventListener('scroll', onScroll)
     }, [])
+
+    // ── 3. [data-animate] — re-anima cada vez que entra en viewport ──
     useEffect(() => {
         const el = wrapperRef.current
         if (!el) return
@@ -209,15 +222,20 @@ const TechStack: React.FC = () => {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
+                    const target = entry.target as HTMLElement
                     if (entry.isIntersecting) {
-                        const target = entry.target as HTMLElement
+                        // Reset para forzar re-animación
+                        target.classList.remove('animated', 'done')
+                        void target.offsetWidth // reflow
                         target.classList.add('animated')
                         target.addEventListener(
                             'animationend',
                             () => target.classList.add('done'),
                             { once: true },
                         )
-                        observer.unobserve(target)
+                    } else {
+                        // Al salir, limpia para el próximo ciclo
+                        target.classList.remove('animated', 'done')
                     }
                 })
             },
@@ -226,10 +244,12 @@ const TechStack: React.FC = () => {
         elements.forEach((e) => observer.observe(e))
         return () => observer.disconnect()
     }, [])
+
     return (
         <>
             <style>{`
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
 @keyframes slideFromLeft {
     from { opacity: 0; transform: translateX(-50px); }
     to   { opacity: 1; transform: translateX(0); }
@@ -241,15 +261,19 @@ const TechStack: React.FC = () => {
 [data-animate="left"].animated.done {
     animation: none; opacity: 1; transform: none;
 }
+
 @keyframes rowFadeUp {
     from { opacity: 0; transform: translateY(32px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
 .marquee-row {
     opacity: 0;
+    transform: translateY(32px);  /* estado inicial para re-entrada */
     position: relative;
     z-index: 10;
     overflow: visible;
+    transition: none;
 }
 .marquee-row.row-1.visible {
     animation: rowFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -263,6 +287,7 @@ const TechStack: React.FC = () => {
 .marquee-row.row-2.visible.done {
     animation: none; opacity: 1; transform: none;
 }
+
 /* ── Layout ── */
 .marquee-section {
     position: relative; width: 100%; overflow: hidden;
@@ -290,6 +315,7 @@ const TechStack: React.FC = () => {
     background: radial-gradient(circle, rgba(228,111,111,0.12) 0%, transparent 70%);
     filter: blur(42px);
 }
+
 /* Header */
 .stack-header {
     position: relative; z-index: 10;
@@ -315,12 +341,14 @@ const TechStack: React.FC = () => {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.875rem; margin: 0; color: #4260C5;
 }
+
 /* Marquee track */
 .marquee-track {
     display: flex; align-items: center;
     width: max-content; will-change: transform;
     padding: 2px 0;
 }
+
 /* ── Cards ── */
 .tech-card {
     position: relative;
@@ -335,11 +363,6 @@ const TechStack: React.FC = () => {
         transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     overflow: hidden;
 }
-/*
-  Default border: neutral #404040 corners
-  On hover (.tech-card--hovered): corners switch to --icon-color
-  No box-shadow / glow at all.
-*/
 .tech-card::before {
     content: "";
     position: absolute; inset: 0; border-radius: 1px;
@@ -357,7 +380,6 @@ const TechStack: React.FC = () => {
     pointer-events: none; z-index: 1;
     transition: background 0.3s ease;
 }
-/* Swap the neutral #404040 for the icon color on hover */
 .tech-card--hovered::before {
     background: linear-gradient(
         175deg,
@@ -388,6 +410,7 @@ const TechStack: React.FC = () => {
     font-size: .72rem;
     transition: color 0.25s ease; white-space: nowrap;
 }
+
 /* Fade edges */
 .marquee-fade {
     position: absolute; top: 0; bottom: 0;
@@ -438,4 +461,5 @@ const TechStack: React.FC = () => {
         </>
     )
 }
+
 export default TechStack
