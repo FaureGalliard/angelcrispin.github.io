@@ -14,6 +14,8 @@
     --font-mono: var(--font-geist-mono);
     --font-firacode: var(--font-fira-code);
     --font-jetbrains: var(--font-jetbrains-mono);
+    --font-roboto: var(--font-roboto);
+    --font-googlesans: var(--font-google-sans);
 }
 
 @media (prefers-color-scheme: dark) {

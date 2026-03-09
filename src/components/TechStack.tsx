@@ -32,40 +32,13 @@ interface TechItem {
     color: string
 }
 
-const TechCard: React.FC<{
-    item: TechItem
-    isHovered: boolean
-    anyHovered: boolean
-    onEnter: () => void
-    onLeave: () => void
-}> = ({ item, isHovered, anyHovered, onEnter, onLeave }) => (
-    <div
-        className={`tech-card${isHovered ? ' tech-card--hovered' : ''}`}
-        onMouseEnter={onEnter}
-        onMouseLeave={onLeave}
-        style={{
-            opacity: anyHovered && !isHovered ? 0.4 : 1,
-            transform: isHovered
-                ? 'scale(1.02) translateY(-4px)'
-                : 'scale(1) translateY(0)',
-            zIndex: isHovered ? 20 : 1,
-            ['--glow-color' as string]: item.color,
-            ['--glow-opacity' as string]: isHovered ? '0.18' : '0.07',
-            ['--icon-color' as string]: item.color,
-        }}>
-        <div className="tech-card-glow" />
+const TechCard: React.FC<{ item: TechItem }> = ({ item }) => (
+    <div className="tech-card">
         <i
             className={`${item.icon} tech-icon`}
-            style={{
-                color: item.color,
-                filter: isHovered ? 'brightness(0.9)' : 'brightness(0.85)',
-            }}
+            style={{ color: item.color }}
         />
-        <span
-            className="tech-name"
-            style={{ color: isHovered ? 'rgba(255,255,255,0.7)' : '#d4d4d4' }}>
-            {item.name}
-        </span>
+        <span className="tech-name">{item.name}</span>
     </div>
 )
 
@@ -111,20 +84,11 @@ function MarqueeRow({
     items,
     trackRef,
     animationClass,
-    hoveredKey,
-    onEnter,
-    onLeave,
-    rowPrefix,
 }: {
     items: TechItem[]
     trackRef: React.RefObject<HTMLDivElement | null>
     animationClass?: string
-    hoveredKey: string | null
-    onEnter: (key: string) => void
-    onLeave: () => void
-    rowPrefix: string
 }) {
-    const anyHovered = hoveredKey !== null
     return (
         <div className={`marquee-row ${animationClass ?? ''}`}>
             <div className="marquee-fade marquee-fade-left" />
@@ -132,19 +96,12 @@ function MarqueeRow({
             <div
                 ref={trackRef}
                 className="marquee-track">
-                {items.map((item, i) => {
-                    const key = `${rowPrefix}-${i}`
-                    return (
-                        <TechCard
-                            key={i}
-                            item={item}
-                            isHovered={hoveredKey === key}
-                            anyHovered={anyHovered}
-                            onEnter={() => onEnter(key)}
-                            onLeave={onLeave}
-                        />
-                    )
-                })}
+                {items.map((item, i) => (
+                    <TechCard
+                        key={i}
+                        item={item}
+                    />
+                ))}
             </div>
         </div>
     )
@@ -153,9 +110,6 @@ function MarqueeRow({
 const TechStack: React.FC = () => {
     const wrapperRef = useRef<HTMLElement>(null)
     const [rowsVisible, setRowsVisible] = useState(false)
-    const [hoveredKey, setHoveredKey] = useState<string | null>(null)
-    const onEnter = useCallback((key: string) => setHoveredKey(key), [])
-    const onLeave = useCallback(() => setHoveredKey(null), [])
 
     const track1 = [...ROW_1, ...ROW_1]
     const track2 = [...ROW_2, ...ROW_2]
@@ -165,21 +119,19 @@ const TechStack: React.FC = () => {
 
     const lastScrollY = useRef(typeof window !== 'undefined' ? window.scrollY : 0)
 
-    // ── 1. Rows visible: se activa y desactiva cada vez que entra/sale ──
+    // Rows visible: activates/deactivates on viewport enter/leave
     useEffect(() => {
         const el = wrapperRef.current
         if (!el) return
         const observer = new IntersectionObserver(
-            ([entry]) => {
-                setRowsVisible(entry.isIntersecting) // ← true/false en cada cruce
-            },
+            ([entry]) => setRowsVisible(entry.isIntersecting),
             { threshold: 0.15 },
         )
         observer.observe(el)
         return () => observer.disconnect()
     }, [])
 
-    // ── 2. Scroll-driven marquee direction ──
+    // Scroll-driven marquee direction
     useEffect(() => {
         const track1El = row1.trackRef.current
         const track2El = row2.trackRef.current
@@ -214,7 +166,7 @@ const TechStack: React.FC = () => {
         return () => window.removeEventListener('scroll', onScroll)
     }, [])
 
-    // ── 3. [data-animate] — re-anima cada vez que entra en viewport ──
+    // [data-animate] — re-animates every time it enters viewport
     useEffect(() => {
         const el = wrapperRef.current
         if (!el) return
@@ -224,9 +176,8 @@ const TechStack: React.FC = () => {
                 entries.forEach((entry) => {
                     const target = entry.target as HTMLElement
                     if (entry.isIntersecting) {
-                        // Reset para forzar re-animación
                         target.classList.remove('animated', 'done')
-                        void target.offsetWidth // reflow
+                        void target.offsetWidth
                         target.classList.add('animated')
                         target.addEventListener(
                             'animationend',
@@ -234,7 +185,6 @@ const TechStack: React.FC = () => {
                             { once: true },
                         )
                     } else {
-                        // Al salir, limpia para el próximo ciclo
                         target.classList.remove('animated', 'done')
                     }
                 })
@@ -269,7 +219,7 @@ const TechStack: React.FC = () => {
 
 .marquee-row {
     opacity: 0;
-    transform: translateY(32px);  /* estado inicial para re-entrada */
+    transform: translateY(32px);
     position: relative;
     z-index: 10;
     overflow: visible;
@@ -288,7 +238,7 @@ const TechStack: React.FC = () => {
     animation: none; opacity: 1; transform: none;
 }
 
-/* ── Layout ── */
+/* Layout */
 .marquee-section {
     position: relative; width: 100%; overflow: hidden;
     background: #000; padding: 5rem 0 3rem;
@@ -306,7 +256,7 @@ const TechStack: React.FC = () => {
 .orb-center {
     left: 50%; top: 50%; transform: translate(-50%,-50%);
     width: 60%; height: 150%;
-    background: radial-gradient(circle, rgba(248,218,99,0.11) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255,255,255,0.11) 0%, transparent 70%);
     filter: blur(45px);
 }
 .orb-right {
@@ -324,22 +274,10 @@ const TechStack: React.FC = () => {
     display: flex; flex-direction: column;
     align-items: center; gap: 0.25rem;
 }
-.stack-badge {
-    display: inline-flex; align-items: center;
-    padding: 0.125rem 0.625rem; border-radius: 9999px;
-    font-size: 0.625rem; margin-bottom: 0.25rem;
-    border: 1px solid #6b7280; background: rgba(0,0,0,0.1);
-    color: #9ca3af; font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.06em; text-transform: uppercase;
-}
 .stack-title {
     font-family: 'JetBrains Mono', monospace;
     font-size: 1.75rem; font-weight: 700;
     color: #fff; margin: 0; line-height: 1;
-}
-.stack-subtitle {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.875rem; margin: 0; color: #4260C5;
 }
 
 /* Marquee track */
@@ -349,7 +287,7 @@ const TechStack: React.FC = () => {
     padding: 2px 0;
 }
 
-/* ── Cards ── */
+/* Cards */
 .tech-card {
     position: relative;
     display: flex; align-items: center; justify-content: center;
@@ -357,10 +295,6 @@ const TechStack: React.FC = () => {
     width: 240px; height: 130px;
     flex-shrink: 0; margin: 0 .2rem;
     background: #000; border-radius: 1px;
-    border: 1px solid transparent; cursor: default;
-    transition:
-        opacity 0.3s ease,
-        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     overflow: hidden;
 }
 .tech-card::before {
@@ -378,37 +312,28 @@ const TechStack: React.FC = () => {
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none; z-index: 1;
-    transition: background 0.3s ease;
-}
-.tech-card--hovered::before {
-    background: linear-gradient(
-        175deg,
-        var(--icon-color, #404040),
-        transparent 18%,
-        transparent 85%,
-        var(--icon-color, #404040)
-    );
 }
 .tech-card-glow {
     position: absolute; inset: 0; pointer-events: none;
     background: radial-gradient(
         ellipse 80% 55% at 50% 115%,
-        color-mix(in srgb, var(--glow-color, #fff) calc(var(--glow-opacity, 0.07) * 100%), transparent) 0%,
+        color-mix(in srgb, var(--glow-color, #fff) 7%, transparent) 0%,
         transparent 40%
     );
-    transition: background 0.35s ease; z-index: 0;
+    z-index: 0;
 }
 .tech-icon {
     position: relative; z-index: 2;
     font-size: 2.4rem;
-    transition: filter 0.25s ease, color 0.25s ease;
+    filter: brightness(0.85);
 }
 .tech-icon::before { color: inherit !important; }
 .tech-name {
     position: relative; z-index: 2;
     font-family: 'JetBrains Mono', monospace;
     font-size: .72rem;
-    transition: color 0.25s ease; white-space: nowrap;
+    color: #d4d4d4;
+    white-space: nowrap;
 }
 
 /* Fade edges */
@@ -428,9 +353,6 @@ const TechStack: React.FC = () => {
             <section
                 ref={wrapperRef}
                 className="marquee-section">
-                <div className="orb orb-left"></div>
-                <div className="orb orb-center"></div>
-                <div className="orb orb-right"></div>
                 <div className="stack-header">
                     <h2
                         data-animate="left"
@@ -443,19 +365,11 @@ const TechStack: React.FC = () => {
                     items={track1}
                     trackRef={row1.trackRef}
                     animationClass={`row-1${rowsVisible ? ' visible' : ''}`}
-                    hoveredKey={hoveredKey}
-                    onEnter={onEnter}
-                    onLeave={onLeave}
-                    rowPrefix="r1"
                 />
                 <MarqueeRow
                     items={track2}
                     trackRef={row2.trackRef}
                     animationClass={`row-2${rowsVisible ? ' visible' : ''}`}
-                    hoveredKey={hoveredKey}
-                    onEnter={onEnter}
-                    onLeave={onLeave}
-                    rowPrefix="r2"
                 />
             </section>
         </>
