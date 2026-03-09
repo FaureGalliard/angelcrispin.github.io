@@ -35,16 +35,16 @@ export default function ContactSection() {
                             alt="Avatar"
                             width={80}
                             height={80}
-                            className="w-20 h-20 rounded-full object-cover"
+                            className="w-16 h-16 rounded-full object-cover"
                         />
                         <span
-                            className="text-4xl md:text-[70px] font-medium leading-tight"
+                            className="text-[40px] md:text-[60px] font-medium leading-tight"
                             style={{ color: '#5E626C' }}>
                             Let&apos;s work
                         </span>
                     </div>
                     <h1
-                        className="text-[40px] md:text-[70px] font-medium leading-tight"
+                        className="text-[40px] md:text-[60px] font-medium leading-tight"
                         style={{ color: '#FFFFFF' }}>
                         together
                     </h1>
@@ -54,7 +54,7 @@ export default function ContactSection() {
                 <div className="relative flex items-center mb-10">
                     <div
                         className="flex-1 h-px"
-                        style={{ backgroundColor: '#5E626C', opacity: 0.4 }}
+                        style={{ backgroundColor: '#ffffff', opacity: 0.4 }}
                     />
                     <button
                         className="absolute right-0 -translate-y-1/2 top-1/2 w-28 h-28 rounded-full flex items-center justify-center text-white text-sm font-medium transition-transform duration-300 hover:scale-110 cursor-pointer"
@@ -64,10 +64,10 @@ export default function ContactSection() {
                 </div>
 
                 {/* Contact pills */}
-                <div className="flex flex-wrap gap-3 mt-4">
+                <div className="flex font-inter  flex-wrap gap-3 mt-4">
                     <a
                         href="mailto:contact@angelcrispin.dev"
-                        className="px-5 py-3 rounded-full border text-sm font-normal transition-all duration-200 hover:border-[#445ADE] hover:text-white"
+                        className="px-5 py-3 rounded-full border text-[12px]  transition-all duration-200 hover:border-[#445ADE] hover:text-white"
                         style={{
                             borderColor: '#5E626C',
                             color: '#FFFFFF',
@@ -77,7 +77,7 @@ export default function ContactSection() {
                     </a>
                     <a
                         href="tel:+51926447831"
-                        className="px-5 py-3 rounded-full border text-sm font-normal transition-all duration-200 hover:border-[#445ADE] hover:text-white"
+                        className="px-5 py-3 rounded-full border text-[12px]  transition-all duration-200 hover:border-[#445ADE] hover:text-white"
                         style={{
                             borderColor: '#5E626C',
                             color: '#FFFFFF',
@@ -92,24 +92,24 @@ export default function ContactSection() {
             <div className="flex items-end justify-between text-xs mt-16">
                 <div className="flex gap-10">
                     <div>
-                        <p className="text-[#5E626C] font-semibold uppercase  text-[10px] mb-1">
+                        <p className="text-[#5E626C] font-semibold uppercase  text-[8px] mb-1">
                             Version
                         </p>
                         <p className="text-[#ffffff]">2026 © Edition</p>
                     </div>
                     <div>
-                        <p className="text-[#5E626C] font-semibold uppercase  text-[10px] mb-1">
+                        <p className="text-[#5E626C] font-semibold uppercase  text-[8px] mb-1">
                             Local time
                         </p>
                         <p className="text-[#ffffff]">{time}</p>
                     </div>
                 </div>
-                <div className="text-right">
-                    <p className="text-[#5E626C] font-semibold uppercase text-[10px] mb-1">
+                <div className="">
+                    <p className="text-[#5E626C] font-semibold uppercase text-[8px] mb-1">
                         Socials
                     </p>
                     <a
-                        href="#"
+                        href="https://www.linkedin.com/in/angelcrispin/"
                         className="hover:text-white transition-colors duration-200"
                         style={{ color: '#FFFFFF' }}>
                         Linkedin

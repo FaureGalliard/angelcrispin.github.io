@@ -5,7 +5,7 @@ import Footer from '@/components/Footer'
 import SmoothScroll from '@/components/SmoothScroll'
 import CustomCursor from '@/components/CustomCursor'
 import Contact from '@/components/Contact'
-
+import Services from '@/components/Services'
 const firaCode = Fira_Code({
     subsets: ['latin'],
     variable: '--font-fira-code',
@@ -68,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <SmoothScroll>
                     <CustomCursor />
                     <Contact />
+                    <Services />
                     <main className="min-h-[calc(100vh-8rem)] flex flex-col">
                         {children}
                     </main>
