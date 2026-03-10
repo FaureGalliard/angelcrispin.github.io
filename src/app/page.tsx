@@ -1,18 +1,10 @@
-import Hero from '@/components/Hero'
-import About from '@/components/About'
-import Projects from '@/components/Projects'
-import TechStack from '@/components/TechStack'
-import KpiKpiSection from '@/components/KpiSection'
+import Contact from '@/components/Contact'
+import Services from '@/components/Services'
 export default function Home() {
     return (
         <>
-            <Hero />
-
-            <KpiKpiSection />
-            <Projects />
-            <TechStack />
-
-            <About />
+            <Contact />
+            <Services />
         </>
     )
 }
