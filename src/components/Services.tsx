@@ -1,82 +1,55 @@
-'use client'
+import Section from './shared/Section'
 
-const services = [
+const SERVICES = [
     {
-        number: '01',
+        num: '01',
         title: 'Full-Stack Development',
-        description:
-            'Building scalable web applications with modern frameworks and architectures. From frontend interfaces to backend systems.',
+        desc: 'Building scalable web applications with modern frameworks and architectures. From frontend interfaces to backend systems.',
+        tags: ['Next.js', 'TypeScript', 'Node.js'],
     },
     {
-        number: '02',
+        num: '02',
         title: 'System Architecture',
-        description:
-            'Designing robust software systems that scale. Clean code, optimal performance, and maintainable solutions.',
+        desc: 'Designing robust software systems that scale. Clean code, optimal performance, and maintainable solutions.',
+        tags: ['PostgreSQL', 'MongoDB', 'REST'],
     },
     {
-        number: '03',
-        title: 'Technical Consulting',
-        description:
-            'Strategic guidance on technology decisions, code reviews, and engineering best practices for your projects.',
+        num: '03',
+        title: 'Automatization',
+        desc: 'Implementing automated solutions to streamline development processes and improve efficiency.',
+        tags: ['Python', 'CI/CD', 'Docker', 'n8n'],
     },
-]
+] as const
 
-export default function ServicesSection() {
+export default function Services() {
     return (
-        <section
-            className="font-inter min-h-screen flex flex-col"
-            style={{ backgroundColor: '#1A1A1A' }}>
-            <div className="w-full max-w-6xl mx-auto px-8 py-12 flex flex-col flex-1">
-                {/* Top label */}
-
-                {/* Heading + CTA */}
-                <div className="flex items-start justify-between mb-14">
-                    <h2
-                        className="text-5xl font-medium"
-                        style={{ color: '#FFFFFF' }}>
-                        I can help you with
-                    </h2>
-                </div>
-
-                {/* Horizontal services */}
-                <div className="grid grid-cols-3 gap-16 flex-1">
-                    {services.map((service, index) => (
-                        <div
-                            key={index}
-                            className="group cursor-default">
-                            {/* number */}
-                            <div className="flex items-center gap-3 mb-2">
+        <Section
+            id="services"
+            label="I can help you with">
+            {SERVICES.map(({ num, title, desc, tags }) => (
+                <div
+                    key={num}
+                    className="grid grid-cols-[40px_1fr] gap-x-8 py-7 border-t border-gray/20 last:border-b last:border-gray/20">
+                    <p className="text-[13px] font-semibold text-gray pt-0.5">{num}</p>
+                    <div>
+                        <p className="text-[15px] font-semibold text-black mb-1.5">
+                            {title}
+                        </p>
+                        <p className="text-[13px] text-gray leading-[1.65] mb-3">
+                            {desc}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                            {tags.map((t) => (
                                 <span
-                                    className="text-[11px]"
-                                    style={{ color: '#5E626C' }}>
-                                    {service.number}
+                                    key={t}
+                                    className="text-[11px] font-medium tracking-[0.04em] uppercase text-gray border border-gray/20 px-2 py-[3px]">
+                                    {t}
                                 </span>
-                            </div>
-                            <div className="pt-2 mb-14">
-                                <div
-                                    className="h-px w-full"
-                                    style={{ backgroundColor: '#5E626C', opacity: 0.3 }}
-                                />
-                            </div>
-                            {/* title */}
-                            <h3
-                                className="text-[22px] font-medium mb-6 transition-colors duration-300 group-hover:text-[#445ADE]"
-                                style={{ color: '#FFFFFF' }}>
-                                {service.title}
-                            </h3>
-
-                            {/* description */}
-                            <p
-                                className="text-[12px] leading-5 "
-                                style={{ color: '#ffffff' }}>
-                                {service.description}
-                            </p>
+                            ))}
                         </div>
-                    ))}
+                    </div>
                 </div>
-
-                {/* Bottom divider */}
-            </div>
-        </section>
+            ))}
+        </Section>
     )
 }
