@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Section from './shared/Section'
+import Section from './common/Section'
 
 const PROJECTS = [
     {

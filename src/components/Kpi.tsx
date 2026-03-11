@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { useInView, useMotionValue, useSpring, animate } from 'framer-motion'
-import Section from './shared/Section'
+import Section from './common/Section'
 
 const STATS = [
     { value: '20+', label: 'Projects completed' },

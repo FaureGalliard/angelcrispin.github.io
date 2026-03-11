@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-
+import RoundedButton from './common/RoundedButton'
 const NAME = 'Angel Crispin'
 const ROLE = 'Software Engineer'
 const LOCATION = 'Lima, Perú'
@@ -51,19 +51,26 @@ export default function Hero() {
                 {BIO}
             </motion.p>
             <motion.div
-                className="flex gap-3 flex-wrap mb-[30px]"
+                className="flex gap-5 flex-wrap mb-[30px]"
                 variants={fadeUp}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
-                <Link
+                <RoundedButton
                     href="#contact"
-                    className="text-[14px] font-medium px-[18px] py-[9px] bg-black text-white hover:bg-accent hover:scale-102 transition-transform">
-                    Get in touch
-                </Link>
-                <Link
+                    bg="var(--color-black)"
+                    fillColor="var(--color-accent)"
+                    textColor="var(--color-white)"
+                    borderColor="transparent"
+                    borderHoverColor="transparent">
+                    <span className="text-[14px] font-medium">Get in touch</span>
+                </RoundedButton>
+                <RoundedButton
                     href="#projects"
-                    className="text-[14px] font-medium px-[18px] py-[9px] border border-gray text-gray hover:bg-accent hover:scale-102 hover:border-transparent hover:text-white   transition-transform">
-                    View projects
-                </Link>
+                    fillColor="var(--color-accent)"
+                    textColor="var(--color-gray)"
+                    borderColor="var(--color-gray)"
+                    borderHoverColor="transparent">
+                    <span className="text-[14px] font-medium">View projects</span>
+                </RoundedButton>
             </motion.div>
         </motion.section>
     )

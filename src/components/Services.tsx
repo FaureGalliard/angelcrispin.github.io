@@ -1,4 +1,4 @@
-import Section from './shared/Section'
+import Section from './common/Section'
 
 const SERVICES = [
     {

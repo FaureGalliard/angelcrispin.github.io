@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Section from './shared/Section'
+import Section from './common/Section'
 
 const CONTACT_INTRO =
     'Open to internships, collaborations, and interesting engineering problems. Reach out through any of the channels below.'

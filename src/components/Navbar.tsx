@@ -1,45 +1,12 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-
+import Magnetic from './common/Magnetic'
 const NAV_LINKS = ['about', 'projects', 'contact', 'experience'] as const
 type NavLink = (typeof NAV_LINKS)[number]
 
 const EASE_TRANSITION = 'all 0.5s cubic-bezier(0.06, 0, 0.14, 0.8)'
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-
-function Magnetic({ children }: { children: React.ReactNode }) {
-    const ref = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        const el = ref.current
-        if (!el) return
-
-        const xTo = gsap.quickTo(el, 'x', { duration: 1, ease: 'elastic.out(1, 0.3)' })
-        const yTo = gsap.quickTo(el, 'y', { duration: 1, ease: 'elastic.out(1, 0.3)' })
-
-        const onMove = (e: MouseEvent) => {
-            const { clientX, clientY } = e
-            const { height, width, left, top } = el.getBoundingClientRect()
-            xTo((clientX - (left + width / 2)) * 0.35)
-            yTo((clientY - (top + height / 2)) * 0.35)
-        }
-        const onLeave = () => {
-            xTo(0)
-            yTo(0)
-        }
-
-        el.addEventListener('mousemove', onMove)
-        el.addEventListener('mouseleave', onLeave)
-        return () => {
-            el.removeEventListener('mousemove', onMove)
-            el.removeEventListener('mouseleave', onLeave)
-        }
-    }, [])
-
-    return <div ref={ref}>{children}</div>
-}
 
 function Logo() {
     const [hovered, setHovered] = useState(false)
