@@ -1,9 +1,7 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const NAV_LINKS = ['about', 'projects', 'contact', 'experience'] as const
 type NavLink = (typeof NAV_LINKS)[number]
@@ -48,21 +46,24 @@ function Logo() {
     const codeByRef = useRef<HTMLSpanElement>(null)
     const angelRef = useRef<HTMLSpanElement>(null)
     const crispinRef = useRef<HTMLSpanElement>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
+
     const [codeByW, setCodeByW] = useState(0)
     const [crispinLeft, setCrispinLeft] = useState(0)
+    const [crispinW, setCrispinW] = useState(0)
 
     const measure = () => {
-        if (codeByRef.current && angelRef.current) {
+        if (codeByRef.current && angelRef.current && crispinRef.current) {
             setCodeByW(codeByRef.current.offsetWidth)
             setCrispinLeft(angelRef.current.offsetLeft + angelRef.current.offsetWidth)
+            setCrispinW(crispinRef.current.offsetWidth)
         }
     }
 
     useEffect(() => {
         measure()
         const ro = new ResizeObserver(measure)
-        if (codeByRef.current) ro.observe(codeByRef.current)
-        if (angelRef.current) ro.observe(angelRef.current)
+        if (containerRef.current) ro.observe(containerRef.current)
         return () => ro.disconnect()
     }, [])
 
@@ -82,8 +83,12 @@ function Logo() {
             </span>
 
             <div
+                ref={containerRef}
                 className="relative overflow-hidden whitespace-nowrap ml-[8px] flex"
-                style={{ transition: EASE_TRANSITION, paddingRight: hovered ? 30 : 0 }}>
+                style={{
+                    transition: EASE_TRANSITION,
+                    paddingRight: hovered ? crispinW : 0,
+                }}>
                 <span
                     ref={codeByRef}
                     style={{
@@ -126,58 +131,27 @@ function Logo() {
 }
 
 export default function Nav() {
-    const [isActive, setIsActive] = useState(false)
-    const pathname = usePathname()
-    const burgerRef = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        setIsActive(false)
-    }, [pathname])
-
-    useLayoutEffect(() => {
-        gsap.registerPlugin(ScrollTrigger)
-        const el = burgerRef.current
-        if (!el) return
-
-        gsap.set(el, { scale: 0 })
-
-        const st = ScrollTrigger.create({
-            trigger: document.documentElement,
-            start: 0,
-            end: window.innerHeight,
-            onLeave: () => gsap.to(el, { scale: 1, duration: 0.25, ease: 'power1.out' }),
-            onEnterBack: () => {
-                gsap.to(el, { scale: 0, duration: 0.25, ease: 'power1.out' })
-                setIsActive(false)
-            },
-        })
-
-        return () => st.kill()
-    }, [])
-
     return (
-        <>
-            <nav className="py-[4px] inset-x-0 z-50 bg-white">
-                <div className="mx-auto px-6 flex items-center justify-between h-13">
-                    <Logo />
-                    <ul className="flex gap-7 list-none">
-                        {NAV_LINKS.map((link: NavLink) => (
-                            <li
-                                key={link}
-                                className="relative flex flex-col items-center group">
-                                <Magnetic>
-                                    <Link
-                                        href={`#${link}`}
-                                        className="text-[14px] text-gray hover:text-black transition-colors duration-200 inline-block">
-                                        {capitalize(link)}
-                                    </Link>
-                                </Magnetic>
-                                <div className="w-[5px] h-[5px] rounded-full bg-black absolute -bottom-2 scale-0 group-hover:scale-100 transition-transform duration-300" />
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </nav>
-        </>
+        <nav className="py-[4px] inset-x-0 z-50 bg-white">
+            <div className="mx-auto px-6 flex items-center justify-between h-13">
+                <Logo />
+                <ul className="flex gap-7 list-none">
+                    {NAV_LINKS.map((link: NavLink) => (
+                        <li
+                            key={link}
+                            className="relative flex flex-col items-center group">
+                            <Magnetic>
+                                <Link
+                                    href={`#${link}`}
+                                    className="text-[14px] text-gray hover:text-black transition-colors duration-200 inline-block">
+                                    {capitalize(link)}
+                                </Link>
+                            </Magnetic>
+                            <div className="w-[5px] h-[5px] rounded-full bg-black absolute -bottom-2 scale-0 group-hover:scale-100 transition-transform duration-300" />
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </nav>
     )
 }
