@@ -11,7 +11,7 @@ export default function Section({ id, label, children }: SectionProps) {
         <section
             id={id}
             className="py-13">
-            <p className="text-[12px] font-semibold tracking-[0.1em] uppercase text-black mb-10">
+            <p className="text-[14px] font-semibold tracking-[0.04em] uppercase text-black mb-10">
                 {label}
             </p>
             {children}

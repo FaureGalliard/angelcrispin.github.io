@@ -42,7 +42,7 @@ export default function Skills() {
             <div className="flex flex-col gap-8 border-b border-gray/20 pb-18">
                 {TECH_STACK.map(({ name, tags }) => (
                     <div key={name}>
-                        <p className="text-[10px] font-semibold tracking-[0.06em] uppercase text-gray mb-3">
+                        <p className="text-[12px] font-semibold tracking-[0.06em] uppercase text-gray mb-3">
                             {name}
                         </p>
                         <div className="flex flex-wrap gap-2">

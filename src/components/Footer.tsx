@@ -30,16 +30,16 @@ function LocalTime() {
 export default function Footer() {
     return (
         <footer className="py-8">
-            <div className="max-w-[760px] mx-auto px-6 flex justify-between text-[10px] text-gray">
+            <div className="mx-auto px-6 flex justify-between text-[12px] text-gray">
                 <div>
                     Version
                     <br />
-                    <span className="text-xs text-black">{EDITION}</span>
+                    <span className="text-[13px] text-black">{EDITION}</span>
                 </div>
                 <div>
                     LocalTime
                     <br />
-                    <span className="text-[12px] text-black">
+                    <span className="text-[13px] text-black">
                         <LocalTime /> {TIMEZONE_LABEL}
                     </span>
                 </div>

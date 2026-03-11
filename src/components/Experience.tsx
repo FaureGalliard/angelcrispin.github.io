@@ -42,7 +42,7 @@ export default function Experience() {
                 <div
                     key={title}
                     className="grid grid-cols-[120px_1fr] max-sm:grid-cols-1 gap-x-8 py-7 border-t border-gray/20 last:border-b last:border-gray/20">
-                    <p className="text-xs text-gray pt-0.5 max-sm:mb-1.5">{date}</p>
+                    <p className="text-[13px] text-gray pt-0.5 max-sm:mb-1.5">{date}</p>
                     <div>
                         <p className="text-[15px] font-semibold text-black mb-1">
                             {title}

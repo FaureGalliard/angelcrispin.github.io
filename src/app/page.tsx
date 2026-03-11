@@ -14,7 +14,7 @@ export default function Page() {
         <div className="font-inter">
             <Navbar />
             <main className="pt-13">
-                <div className="max-w-[760px] mx-auto px-6">
+                <div className="max-w-[900px] mx-auto px-6">
                     <Hero />
 
                     <KPI />
