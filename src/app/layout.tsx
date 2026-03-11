@@ -33,10 +33,10 @@ const googleSans = Google_Sans({
     display: 'swap',
 })
 export const metadata: Metadata = {
-    title: 'Ángel Crispín Ingeniero de Software',
+    title: 'Ángel Crispín ',
     description: 'Ingeniero de Software, Data Science y Proyectos Tecnológicos',
     icons: {
-        icon: '/favicon.ico',
+        icon: 'https://avatars.githubusercontent.com/u/92346624?v=4',
     },
     openGraph: {
         title: 'Ángel Crispín | Ingeniero de Software',
@@ -60,19 +60,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html
             lang="es"
             className={`${inter.variable} ${firaCode.variable} ${jetbrainsMono.variable} ${roboto.variable} ${googleSans.variable}       antialiased`}>
-            <body className="bg-[rgba(16,17,17,1)] text-zinc-100 font-sans">
-                <link
-                    rel="stylesheet"
-                    href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
-                />
-                <SmoothScroll>
-                    <CustomCursor />
-                    <Contact />
-                    <Services />
-                    <main className="min-h-[calc(100vh-8rem)] flex flex-col">
-                        {children}
-                    </main>
-                </SmoothScroll>
+            <body className="">
+                <SmoothScroll>{children}</SmoothScroll>
             </body>
         </html>
     )

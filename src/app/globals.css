@@ -1,32 +1,19 @@
 @import 'tailwindcss';
 
-:root {
-    --background: #ffffff;
-    --foreground: #171717;
-}
-
 /* Firefox */
 
-@theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
+@theme {
     --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
     --font-firacode: var(--font-fira-code);
     --font-jetbrains: var(--font-jetbrains-mono);
     --font-roboto: var(--font-roboto);
     --font-googlesans: var(--font-google-sans);
-}
+    --font-inter: var(--font-inter);
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
-}
-
-body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+    --color-black: #1a1a1a;
+    --color-gray: #44464d;
+    --color-white: #ffffff;
+    --color-accent: #445ade;
+    --color-accent-hover: #3647b8;
 }

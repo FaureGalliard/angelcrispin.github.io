@@ -66,23 +66,13 @@ export default function ContactSection() {
                 {/* Contact pills */}
                 <div className="flex font-inter  flex-wrap gap-3 mt-4">
                     <a
-                        href="mailto:contact@angelcrispin.dev"
-                        className="px-5 py-3 rounded-full border text-[12px]  transition-all duration-200 hover:border-[#445ADE] hover:text-white"
-                        style={{
-                            borderColor: '#5E626C',
-                            color: '#FFFFFF',
-                            backgroundColor: 'transparent',
-                        }}>
+                        className="border-[#5E626C] px-5 py-3 rounded-full border text-[12px]  transition-all duration-250 hover:translate-y-[-3px] hover:scale-105  hover:bg-[#445ADE] hover:border-transparent "
+                        href="mailto:contact@angelcrispin.dev">
                         contact@angelcrispin.dev
                     </a>
                     <a
                         href="tel:+51926447831"
-                        className="px-5 py-3 rounded-full border text-[12px]  transition-all duration-200 hover:border-[#445ADE] hover:text-white"
-                        style={{
-                            borderColor: '#5E626C',
-                            color: '#FFFFFF',
-                            backgroundColor: 'transparent',
-                        }}>
+                        className="border-[#5E626C] px-5 py-3 rounded-full border text-[12px]  transition-all duration-250 hover:translate-y-[-3px] hover:scale-105  hover:bg-[#445ADE] hover:border-transparent ">
                         +51 926 447 831
                     </a>
                 </div>
