@@ -49,7 +49,7 @@ function Logo() {
     const containerRef = useRef<HTMLDivElement>(null)
 
     const [codeByW, setCodeByW] = useState(0)
-    const [crispinLeft, setCrispinLeft] = useState(0)
+    const [crispinLeft, setCrispinLeft] = useState(9999)
     const [crispinW, setCrispinW] = useState(0)
 
     const measure = () => {
