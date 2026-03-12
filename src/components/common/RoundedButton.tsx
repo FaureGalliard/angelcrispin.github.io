@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Magnetic from './Magnetic'
 import { type Variants } from 'framer-motion'
+
 interface RoundedButtonProps {
     children: React.ReactNode
     href?: string
@@ -11,7 +12,8 @@ interface RoundedButtonProps {
     fillColor?: string
     textColor?: string
     textHoverColor?: string
-    borderColor?: string
+    borderIdleColor?: string
+    borderEnterColor?: string
     className?: string
     padding?: string
     onClick?: () => void
@@ -20,21 +22,29 @@ interface RoundedButtonProps {
 type Phase = 'idle' | 'enter' | 'exit'
 
 const circleVariants: Variants = {
-    idle: { top: '100%', width: '100%', height: '150%' },
+    idle: {
+        top: '100%',
+        width: '30%',
+        height: '150%',
+        opacity: 0,
+        transition: { duration: 0 },
+    },
     enter: {
         top: '-25%',
-        width: '150%',
-        height: '150%',
+        width: '130%',
+        height: '200%',
+        opacity: 1,
         transition: {
-            duration: 0.4,
+            duration: 0.5,
             ease: [0.215, 0.61, 0.355, 1],
         },
     },
     exit: {
-        top: '-150%',
-        width: '125%',
+        top: '-200%',
+        width: '85%',
         height: '150%',
-        transition: { duration: 0.25, ease: 'easeIn' },
+        opacity: 1,
+        transition: { duration: 0.35, ease: 'easeIn' },
     },
 }
 
@@ -42,10 +52,11 @@ export default function RoundedButton({
     children,
     href,
     bg = 'transparent',
-    fillColor = '#455CE9',
+    fillColor = '#ffffff',
     textColor = 'inherit',
-    textHoverColor = 'white',
-    borderColor = 'rgb(136,136,136)',
+    textHoverColor = 'black',
+    borderIdleColor = 'rgb(136,136,136)',
+    borderEnterColor = fillColor,
     padding = '13px 40px',
     className = '',
     onClick,
@@ -69,22 +80,25 @@ export default function RoundedButton({
         leaveTimeout.current = setTimeout(() => setPhase('exit'), 300)
     }
 
-    const isEntered = phase === 'enter'
-
     const inner = (
         <div
             onMouseEnter={onEnter}
             onMouseLeave={onLeave}
             onClick={onClick}
-            className={`relative overflow-hidden inline-flex items-center justify-center rounded-[10px] border cursor-pointer transition-[border-color] duration-350 ease-linear ${className}`}
+            className={`group relative overflow-hidden inline-flex items-center justify-center cursor-pointer transition-[border-color] duration-450 ease-linear isolate border border-solid border-[var(--border-idle)] hover:border-[var(--border-hover)] rounded-[10px] ${className}`}
             style={{
                 padding,
                 backgroundColor: bg,
-                borderColor: isEntered ? fillColor : borderColor,
+                '--text-idle': textColor,
+                '--text-hover': textHoverColor,
+                '--border-idle': borderIdleColor,
+                '--border-hover': borderEnterColor,
+                transform: 'translateZ(0)',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+                willChange: 'transform',
             }}>
-            <span
-                className="relative z-10 pointer-events-none transition-colors duration-400"
-                style={{ color: isEntered ? textHoverColor : textColor }}>
+            <span className="relative z-10 pointer-events-none text-[var(--text-idle)] group-hover:text-[var(--text-hover)] transition-colors duration-400">
                 {children}
             </span>
             <motion.div
@@ -102,7 +116,11 @@ export default function RoundedButton({
             {href ? (
                 <Link
                     href={href}
-                    className="no-underline">
+                    className="no-underline overflow-hidden block"
+                    style={{
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                    }}>
                     {inner}
                 </Link>
             ) : (

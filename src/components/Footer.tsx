@@ -30,7 +30,7 @@ function LocalTime() {
 export default function Footer() {
     return (
         <footer className="py-8">
-            <div className="mx-auto px-6 flex justify-between text-[12px] text-gray">
+            <div className="mx-auto px-6  flex gap-10   text-[12px] text-gray">
                 <div>
                     Version
                     <br />
@@ -42,6 +42,16 @@ export default function Footer() {
                     <span className="text-[13px] text-black">
                         <LocalTime /> {TIMEZONE_LABEL}
                     </span>
+                </div>
+                <div className="ml-auto">
+                    Socials
+                    <br />
+                    <a
+                        className="text-[13px] text-black"
+                        href="https://linkedin.com/in/angelcrispin"
+                        target="">
+                        Linkedin
+                    </a>
                 </div>
             </div>
         </footer>

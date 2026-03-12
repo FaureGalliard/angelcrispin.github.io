@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter, Fira_Code, JetBrains_Mono, Roboto, Google_Sans } from 'next/font/google'
 import SmoothScroll from '@/components/SmoothScroll'
+import HamburgerMenu from '@/components/HamburgerMenu'
 const firaCode = Fira_Code({
     subsets: ['latin'],
     variable: '--font-fira-code',
@@ -57,7 +58,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             lang="es"
             className={`${inter.variable} ${firaCode.variable} ${jetbrainsMono.variable} ${roboto.variable} ${googleSans.variable}       antialiased`}>
             <body className="">
-                <SmoothScroll>{children}</SmoothScroll>
+                <SmoothScroll>
+                    <HamburgerMenu />
+                    {children}
+                </SmoothScroll>
             </body>
         </html>
     )
