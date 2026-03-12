@@ -86,18 +86,20 @@ export default function RoundedButton({
             onMouseLeave={onLeave}
             onClick={onClick}
             className={`group relative overflow-hidden inline-flex items-center justify-center cursor-pointer transition-[border-color] duration-450 ease-linear isolate border border-solid border-[var(--border-idle)] hover:border-[var(--border-hover)] rounded-[10px] ${className}`}
-            style={{
-                padding,
-                backgroundColor: bg,
-                '--text-idle': textColor,
-                '--text-hover': textHoverColor,
-                '--border-idle': borderIdleColor,
-                '--border-hover': borderEnterColor,
-                transform: 'translateZ(0)',
-                backfaceVisibility: 'hidden',
-                WebkitBackfaceVisibility: 'hidden',
-                willChange: 'transform',
-            }}>
+            style={
+                {
+                    padding,
+                    backgroundColor: bg,
+                    '--text-idle': textColor,
+                    '--text-hover': textHoverColor,
+                    '--border-idle': borderIdleColor,
+                    '--border-hover': borderEnterColor,
+                    transform: 'translateZ(0)',
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    willChange: 'transform',
+                } as React.CSSProperties & Record<string, string>
+            }>
             <span className="relative z-10 pointer-events-none text-[var(--text-idle)] group-hover:text-[var(--text-hover)] transition-colors duration-400">
                 {children}
             </span>
