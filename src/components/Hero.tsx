@@ -59,16 +59,14 @@ export default function Hero() {
                     bg="var(--color-black)"
                     fillColor="var(--color-accent)"
                     textColor="var(--color-white)"
-                    borderColor="transparent"
-                    borderHoverColor="transparent">
+                    borderColor="transparent">
                     <span className="text-[14px] font-medium">Get in touch</span>
                 </RoundedButton>
                 <RoundedButton
                     href="#projects"
                     fillColor="var(--color-accent)"
                     textColor="var(--color-gray)"
-                    borderColor="var(--color-gray)"
-                    borderHoverColor="transparent">
+                    borderColor="var(--color-gray)">
                     <span className="text-[14px] font-medium">View projects</span>
                 </RoundedButton>
             </motion.div>

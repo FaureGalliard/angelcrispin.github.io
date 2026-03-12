@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Magnetic from './Magnetic'
-
+import { type Variants } from 'framer-motion'
 interface RoundedButtonProps {
     children: React.ReactNode
     href?: string
@@ -19,13 +19,16 @@ interface RoundedButtonProps {
 
 type Phase = 'idle' | 'enter' | 'exit'
 
-const circleVariants = {
+const circleVariants: Variants = {
     idle: { top: '100%', width: '100%', height: '150%' },
     enter: {
         top: '-25%',
         width: '150%',
         height: '150%',
-        transition: { duration: 0.4, ease: [0.215, 0.61, 0.355, 1] },
+        transition: {
+            duration: 0.4,
+            ease: [0.215, 0.61, 0.355, 1],
+        },
     },
     exit: {
         top: '-150%',
