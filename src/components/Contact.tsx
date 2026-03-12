@@ -29,10 +29,10 @@ export default function Contact() {
                         key={platform}
                         href={href}
                         bg="#ffffffff"
-                        borderIdleColor="black"
+                        borderIdleColor="#1a1a1a"
                         borderEnterColor="transparent"
-                        fillColor="black"
-                        textColor="black"
+                        fillColor="#1a1a1a"
+                        textColor="#1a1a1a"
                         textHoverColor="white"
                         padding="13px 25px">
                         {handle}
