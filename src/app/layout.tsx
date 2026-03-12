@@ -29,16 +29,16 @@ const googleSans = Google_Sans({
     display: 'swap',
 })
 export const metadata: Metadata = {
-    title: 'Ángel Crispín ',
+    title: 'Angel Crispin ',
     description: 'Ingeniero de Software, Data Science y Proyectos Tecnológicos',
     icons: {
         icon: 'https://avatars.githubusercontent.com/u/92346624?v=4',
     },
     openGraph: {
-        title: 'Ángel Crispín | Ingeniero de Software',
+        title: 'Angel Crispin | Ingeniero de Software',
         description: 'Ingeniero de Software, Data Science y Proyectos Tecnológicos',
         url: 'https://angelcrispin.dev',
-        siteName: 'Ángel Crispín',
+        siteName: 'Angel Crispin',
         images: [
             {
                 url: '/og-image.png',

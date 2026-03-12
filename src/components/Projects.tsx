@@ -3,7 +3,7 @@ import Section from './common/Section'
 
 const PROJECTS = [
     {
-        name: 'Hand Gesture Shortcut System',
+        name: 'Gesture Key',
         desc: 'A real-time computer vision system that detects hand gestures from webcam input and triggers operating system shortcuts such as zoom, scroll, and task switching. Combines MediaPipe hand tracking with a Scikit-learn classifier for gesture recognition.',
         tech: ['Python', 'OpenCV', 'MediaPipe', 'Scikit-learn'],
         href: '#',
@@ -15,7 +15,7 @@ const PROJECTS = [
         href: '#',
     },
     {
-        name: 'Stream Deck System Automation',
+        name: 'Desktop Control Toolkit',
         desc: 'A collection of Windows automation scripts designed to integrate with Stream Deck and other launchers, enabling one-click system actions such as shutdown, restart, suspend, and window management.',
         tech: ['Windows', 'Batch', 'PowerShell', 'Automation'],
         href: '#',

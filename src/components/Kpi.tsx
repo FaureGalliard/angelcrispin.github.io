@@ -25,7 +25,7 @@ function AnimatedNumber({ value }: { value: string }) {
         if (!inView || !ref.current) return
         const controls = animate(0, number, {
             duration: 1.2,
-            ease: [0.16, 1, 0.3, 1], // expo out
+            ease: [0.16, 1, 0.3, 1],
             onUpdate: (v) => {
                 if (ref.current) ref.current.textContent = `${Math.round(v)}${suffix}`
             },
