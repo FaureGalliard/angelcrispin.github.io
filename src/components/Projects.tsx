@@ -20,6 +20,12 @@ const PROJECTS = [
         tech: ['Windows', 'Batch', 'PowerShell', 'Automation'],
         href: '#',
     },
+    {
+        name: 'Vocal Teleprompter',
+        desc: 'A voice-synchronized teleprompter that listens to the speaker in real time and automatically scrolls the script to match. Uses the Web Speech API with fuzzy word matching to track the current position in the text, with word-level highlighting, multilanguage support, microphone selection, and a fully customizable display.',
+        tech: ['Tauri', 'React', 'TypeScript', 'Rust', 'Web Speech API', 'Tailwind CSS'],
+        href: 'https://github.com/FaureGalliard/vocal-teleprompter',
+    },
 ] as const
 
 export default function Projects() {
