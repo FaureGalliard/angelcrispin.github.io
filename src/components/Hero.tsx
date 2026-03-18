@@ -1,5 +1,4 @@
 'use client'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import RoundedButton from './common/RoundedButton'
 const NAME = 'Angel Crispin'

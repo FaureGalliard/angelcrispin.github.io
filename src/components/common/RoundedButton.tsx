@@ -66,13 +66,13 @@ export default function RoundedButton({
 
     useEffect(
         () => () => {
-            leaveTimeout.current && clearTimeout(leaveTimeout.current)
+            if (leaveTimeout.current) clearTimeout(leaveTimeout.current)
         },
         [],
     )
 
     const onEnter = () => {
-        leaveTimeout.current && clearTimeout(leaveTimeout.current)
+        if (leaveTimeout.current) clearTimeout(leaveTimeout.current)
         setPhase('enter')
     }
 

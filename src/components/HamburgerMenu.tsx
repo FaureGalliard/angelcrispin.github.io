@@ -143,10 +143,9 @@ function BurgerButton({ isActive, onClick }: BurgerButtonProps) {
 // ─── Curve ────────────────────────────────────────────────────────────────────
 
 function Curve() {
-    const [height, setHeight] = useState(800)
-    useEffect(() => {
-        setHeight(window.innerHeight)
-    }, [])
+    const [height] = useState(() =>
+        typeof window !== 'undefined' ? window.innerHeight : 800,
+    )
 
     const initialPath = `M100 0 L100 ${height} Q-100 ${height / 2} 100 0`
     const targetPath = `M100 0 L100 ${height} Q100  ${height / 2} 100 0`
@@ -274,7 +273,8 @@ export default function HamburgerMenu() {
     const buttonRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (isActive) setIsActive(false)
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsActive(false)
     }, [pathname])
 
     useLayoutEffect(() => {
