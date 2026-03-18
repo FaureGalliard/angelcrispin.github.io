@@ -85,31 +85,39 @@ export default function RoundedButton({
             onMouseEnter={onEnter}
             onMouseLeave={onLeave}
             onClick={onClick}
-            className={`group relative overflow-hidden inline-flex items-center justify-center cursor-pointer transition-[border-color] duration-450 ease-linear isolate border border-solid border-[var(--border-idle)] hover:border-[var(--border-hover)] rounded-[10px] ${className}`}
+            className={`group relative inline-flex cursor-pointer border border-solid border-[var(--border-idle)] hover:border-[var(--border-hover)] rounded-[10px] transition-[border-color] duration-450 ease-linear ${className}`}
             style={
                 {
-                    padding,
+                    outline: 'none',
+                    boxShadow: 'none',
+                    WebkitTapHighlightColor: 'transparent',
                     backgroundColor: bg,
                     '--text-idle': textColor,
                     '--text-hover': textHoverColor,
                     '--border-idle': borderIdleColor,
                     '--border-hover': borderEnterColor,
+                } as React.CSSProperties & Record<string, string>
+            }>
+            <div
+                className="relative overflow-hidden inline-flex items-center justify-center rounded-[9px] isolate"
+                style={{
+                    padding,
                     transform: 'translateZ(0)',
                     backfaceVisibility: 'hidden',
                     WebkitBackfaceVisibility: 'hidden',
                     willChange: 'transform',
-                } as React.CSSProperties & Record<string, string>
-            }>
-            <span className="relative z-10 pointer-events-none text-[var(--text-idle)] group-hover:text-[var(--text-hover)] transition-colors duration-400">
-                {children}
-            </span>
-            <motion.div
-                variants={circleVariants}
-                animate={phase}
-                onAnimationComplete={(d) => d === 'exit' && setPhase('idle')}
-                className="absolute left-1/2 -translate-x-1/2 rounded-full"
-                style={{ backgroundColor: fillColor }}
-            />
+                }}>
+                <span className="relative z-10 pointer-events-none text-[var(--text-idle)] group-hover:text-[var(--text-hover)] transition-colors duration-400">
+                    {children}
+                </span>
+                <motion.div
+                    variants={circleVariants}
+                    animate={phase}
+                    onAnimationComplete={(d) => d === 'exit' && setPhase('idle')}
+                    className="absolute left-1/2 -translate-x-1/2 rounded-full"
+                    style={{ backgroundColor: fillColor }}
+                />
+            </div>
         </div>
     )
 
