@@ -1,7 +1,10 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import { useInView, useMotionValue, useSpring, animate } from 'framer-motion'
+import { useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Section from './common/Section'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const STATS = [
     { value: '20+', label: 'Projects completed' },
@@ -19,19 +22,31 @@ function parseValue(value: string): { number: number; suffix: string } {
 function AnimatedNumber({ value }: { value: string }) {
     const { number, suffix } = parseValue(value)
     const ref = useRef<HTMLSpanElement>(null)
-    const inView = useInView(ref, { once: true, margin: '-20% 0px' })
 
     useEffect(() => {
-        if (!inView || !ref.current) return
-        const controls = animate(0, number, {
-            duration: 1.2,
-            ease: [0.16, 1, 0.3, 1],
-            onUpdate: (v) => {
-                if (ref.current) ref.current.textContent = `${Math.round(v)}${suffix}`
+        const el = ref.current
+        if (!el) return
+
+        const obj = { val: 0 }
+
+        const trigger = ScrollTrigger.create({
+            trigger: el,
+            start: 'top 80%',
+            once: true,
+            onEnter: () => {
+                gsap.to(obj, {
+                    val: number,
+                    duration: 1.2,
+                    ease: 'expo.out',
+                    onUpdate: () => {
+                        el.textContent = `${Math.round(obj.val)}${suffix}`
+                    },
+                })
             },
         })
-        return () => controls.stop()
-    }, [inView, number, suffix])
+
+        return () => trigger.kill()
+    }, [number, suffix])
 
     return <span ref={ref}>0{suffix}</span>
 }

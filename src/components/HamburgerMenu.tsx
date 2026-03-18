@@ -113,20 +113,20 @@ function BurgerButton({ isActive, onClick }: BurgerButtonProps) {
 
     return (
         <div
-            className="relative flex items-center justify-center w-20 h-20 m-5 rounded-full border border-white/30 bg-[rgb(41,41,41)] overflow-hidden cursor-pointer"
+            className="relative flex items-center justify-center w-20 h-20 m-5 rounded-full bg-[#1a1a1a] overflow-hidden cursor-pointer"
             onClick={onClick}
             onMouseEnter={onEnter}
             onMouseLeave={onLeave}>
             {/* Barras → X */}
-            <div className="flex flex-col gap-1.5 w-[23px] pointer-events-none z-10">
+            <div className="flex flex-col gap-[5px] w-[22px] pointer-events-none z-10">
                 <span
-                    className={`block w-full h-[1.5px] bg-white rounded-sm origin-center transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.76,0,0.24,1)] ${
-                        isActive ? 'translate-y-[3.75px] rotate-45' : ''
+                    className={`block w-full h-px bg-white origin-center transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.76,0,0.24,1)] ${
+                        isActive ? 'translate-y-[3px] rotate-45' : ''
                     }`}
                 />
                 <span
-                    className={`block w-full h-[1.5px] bg-white rounded-sm origin-center transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.76,0,0.24,1)] ${
-                        isActive ? '-translate-y-[3.75px] -rotate-45' : ''
+                    className={`block w-full h-px bg-white origin-center transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.76,0,0.24,1)] ${
+                        isActive ? '-translate-y-[3px] -rotate-45' : ''
                     }`}
                 />
             </div>

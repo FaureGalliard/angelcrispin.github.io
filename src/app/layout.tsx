@@ -1,16 +1,12 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter, Fira_Code, JetBrains_Mono, Roboto, Google_Sans } from 'next/font/google'
+import { Inter, Fira_Code } from 'next/font/google'
 import SmoothScroll from '@/components/SmoothScroll'
 import HamburgerMenu from '@/components/HamburgerMenu'
+
 const firaCode = Fira_Code({
     subsets: ['latin'],
     variable: '--font-fira-code',
-})
-
-const jetbrainsMono = JetBrains_Mono({
-    subsets: ['latin'],
-    variable: '--font-jetbrains-mono',
 })
 
 const inter = Inter({
@@ -19,18 +15,8 @@ const inter = Inter({
     display: 'swap',
 })
 
-const roboto = Roboto({
-    subsets: ['latin'],
-    variable: '--font-roboto',
-    display: 'swap',
-})
-const googleSans = Google_Sans({
-    subsets: ['latin'],
-    variable: '--font-google-sans',
-    display: 'swap',
-})
 export const metadata: Metadata = {
-    title: 'Angel Crispin ',
+    title: 'Angel Crispin',
     description: 'Ingeniero de Software, Data Science y Proyectos Tecnológicos',
     icons: {
         icon: 'https://avatars.githubusercontent.com/u/92346624?v=4',
@@ -56,8 +42,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html
             lang="es"
-            className={`${inter.variable} ${firaCode.variable} ${jetbrainsMono.variable} ${roboto.variable} ${googleSans.variable}       antialiased`}>
-            <body className="">
+            className={`${inter.variable} ${firaCode.variable} antialiased`}>
+            <body>
                 <SmoothScroll>
                     <HamburgerMenu />
                     {children}

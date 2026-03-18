@@ -4,16 +4,22 @@ import Tag from './common/Tag'
 const TECH_STACK = [
     {
         name: 'Languages',
-        tags: ['Java', 'C++', 'Python', 'TypeScript'],
+        tags: ['Python', 'Java', 'C++', 'TypeScript', 'Rust'],
     },
     {
         name: 'Frameworks & Tools',
         tags: [
             'Next.js',
             'Node.js',
+            'Django',
+            'Flask',
+            'Tauri',
             'Tailwind CSS',
             'Framer Motion',
-            'WebGL',
+            'PyTorch',
+            'OpenCV',
+            'MediaPipe',
+            'SFML',
             'Git',
             'Docker',
         ],
@@ -25,11 +31,14 @@ const TECH_STACK = [
     {
         name: 'Other',
         tags: [
+            'GSAP',
+            'Scikit-learn',
+            'Web Speech API',
+            'CI/CD',
+            'REST APIs',
+            'Linux',
+            'Scrum',
             'Algorithmic Design',
-            'Trading',
-            '3D Printing',
-            'Fusion 360',
-            'DaVinci Resolve',
         ],
     },
 ] as const
