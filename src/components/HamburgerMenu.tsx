@@ -265,8 +265,6 @@ function Nav() {
     )
 }
 
-// ─── HamburgerMenu ────────────────────────────────────────────────────────────
-
 export default function HamburgerMenu() {
     const [isActive, setIsActive] = useState(false)
     const pathname = usePathname()

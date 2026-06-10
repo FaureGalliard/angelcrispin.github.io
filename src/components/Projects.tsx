@@ -1,50 +1,24 @@
 import Link from 'next/link'
 import Section from './common/Section'
-
-const PROJECTS = [
-    {
-        name: 'Gesture Key',
-        desc: 'A real-time computer vision system that detects hand gestures from webcam input and triggers operating system shortcuts such as zoom, scroll, and task switching. Combines MediaPipe hand tracking with a Scikit-learn classifier for gesture recognition.',
-        tech: ['Python', 'OpenCV', 'MediaPipe', 'Scikit-learn'],
-        href: '#',
-    },
-    {
-        name: 'Save the Valley',
-        desc: 'A 2D sandbox game built in C++ featuring a procedurally generated world with dynamic chunk loading, enemy AI with state-based behavior, and a combat system with multiple weapons and hitboxes.',
-        tech: ['C++', 'SFML', 'CMake', 'Game Development'],
-        href: '#',
-    },
-    {
-        name: 'Desktop Control Toolkit',
-        desc: 'A collection of Windows automation scripts designed to integrate with Stream Deck and other launchers, enabling one-click system actions such as shutdown, restart, suspend, and window management.',
-        tech: ['Windows', 'Batch', 'PowerShell', 'Automation'],
-        href: '#',
-    },
-    {
-        name: 'Vocal Teleprompter',
-        desc: 'A voice-synchronized teleprompter that listens to the speaker in real time and automatically scrolls the script to match. Uses the Web Speech API with fuzzy word matching to track the current position in the text, with word-level highlighting, multilanguage support, microphone selection, and a fully customizable display.',
-        tech: ['Tauri', 'React', 'TypeScript', 'Rust', 'Web Speech API', 'Tailwind CSS'],
-        href: 'https://github.com/FaureGalliard/vocal-teleprompter',
-    },
-] as const
+import { projects } from '@/data/Projects'
 
 export default function Projects() {
     return (
         <Section
             id="projects"
             label="Projects">
-            {PROJECTS.map(({ name, desc, tech, href }) => (
+            {projects.map(({ title, description, tech, github }) => (
                 <Link
-                    key={name}
-                    href={href}
-                    target="_blank"
+                    key={title}
+                    href={github ?? '#'}
+                    target={github ? '_blank' : undefined}
                     className="group grid grid-cols-[1fr_auto] items-start gap-4 py-7 border-t border-gray/20 last:border-b last:border-gray/20">
                     <div>
                         <p className="text-[15px] font-semibold text-black mb-1.5 group-hover:underline">
-                            {name}
+                            {title}
                         </p>
                         <p className="text-[13px] text-gray leading-[1.65] mb-3">
-                            {desc}
+                            {description}
                         </p>
                         <div className="flex flex-wrap gap-1.5">
                             {tech.map((t) => (
@@ -56,7 +30,9 @@ export default function Projects() {
                             ))}
                         </div>
                     </div>
-                    <span className="text-lg text-gray/40 mt-0.5">↗</span>
+                    <span className={`text-lg mt-0.5 ${github ? 'text-gray/40' : 'text-gray/20'}`}>
+                        {github ? '↗' : '—'}
+                    </span>
                 </Link>
             ))}
         </Section>

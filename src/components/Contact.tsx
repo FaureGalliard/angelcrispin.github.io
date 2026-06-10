@@ -4,8 +4,8 @@ import RoundedButton from './common/RoundedButton'
 const CONTACT_LINKS = [
     {
         platform: 'Email',
-        handle: 'contacto@angelcrispin.dev',
-        href: 'mailto:contacto@angelcrispin.dev',
+        handle: 'contact@angelcrispin.dev',
+        href: 'mailto:contact@angelcrispin.dev',
     },
     {
         platform: 'Number',

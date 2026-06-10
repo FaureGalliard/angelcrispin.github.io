@@ -2,6 +2,12 @@ import Section from './common/Section'
 
 const EXPERIENCE = [
     {
+        date: '2026 — Present',
+        title: 'Full-Stack Developer',
+        org: 'Industrias Roland Print S.A.C.',
+        desc: 'Designed and built GRAMA, a full-stack teacher training platform for a manufacturing company. Architected the entire system: multi-role auth (admin, director, teacher), course hierarchy with sequential progression, automated grading via PostgreSQL triggers, a RAG chatbot using vector embeddings, materialized analytics views, and a resource repository with IoT equipment metadata. Stack: Next.js 16, TypeScript, Supabase (PostgreSQL + Auth + Storage), React Query, Vercel, Cloudflare.',
+    },
+    {
         date: '2026 — March',
         title: 'Linux Kernel Contributor',
         org: 'Open Source',
@@ -40,7 +46,7 @@ export default function Experience() {
             label="Experience">
             {EXPERIENCE.map(({ date, title, org, desc }) => (
                 <div
-                    key={title}
+                    key={`${title}-${org}`}
                     className="grid grid-cols-[120px_1fr] max-sm:grid-cols-1 gap-x-8 py-7 border-t border-gray/20 last:border-b last:border-gray/20">
                     <p className="text-[13px] text-gray pt-0.5 max-sm:mb-1.5">{date}</p>
                     <div>

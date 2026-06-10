@@ -46,12 +46,22 @@ export default function Footer() {
                 <div className="ml-auto">
                     Socials
                     <br />
-                    <a
-                        className="text-[13px] text-black"
-                        href="https://linkedin.com/in/angelcrispin"
-                        target="">
-                        Linkedin
-                    </a>
+                    <div className="flex gap-4 mt-[2px]">
+                        <a
+                            className="text-[13px] text-black hover:opacity-60 transition-opacity"
+                            href="https://linkedin.com/in/angelcrispin"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            LinkedIn
+                        </a>
+                        <a
+                            className="text-[13px] text-black hover:opacity-60 transition-opacity"
+                            href="https://github.com/FaureGalliard"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            GitHub
+                        </a>
+                    </div>
                 </div>
             </div>
         </footer>

@@ -26,7 +26,7 @@ export const projects: Project[] = [
       "Juego sandbox 2D desarrollado desde cero en C++ con arquitectura propia tipo engine. Mundo infinito procedural, combate con múltiples armas, IA con máquina de estados y renderizado optimizado por chunks.",
     tech: ["C++17", "SFML 2.6", "CMake", "Simplex Noise"],
     type: "game",
-    github: "FaureGalliard/SFML-2D-GAME",
+    github: "https://github.com/FaureGalliard/SFML-2D-GAME",
     featureGroups: [
       {
         icon: "🌍",
@@ -91,7 +91,7 @@ export const projects: Project[] = [
     ],
     tech: ["Python", "OpenCV", "MediaPipe", "Scikit-learn", "PyQt6"],
     type: "ml",
-    github: null,
+    github: "https://github.com/FaureGalliard/GestureKey",
     featureGroups: [],
     pipeline: [
       { icon: "📷", label: "Captura", sub: "OpenCV" },
@@ -115,39 +115,22 @@ export const projects: Project[] = [
     ],
   },
   {
-    title: "Automatización & Sistemas",
-    description: "Integración de datos, sensores, backend y control.",
+    title: "Vocal Teleprompter",
+    description:
+      "Teleprompter sincronizado por voz que escucha al locutor en tiempo real y avanza automáticamente el guión. Usa Web Speech API con fuzzy matching para rastrear la posición en el texto, con resaltado palabra por palabra, soporte multiidioma y selección de micrófono.",
     highlights: [
-      "Integración de sensores IoT",
-      "Backend escalable",
-      "Sistema de control en tiempo real",
+      "Reconocimiento de voz en tiempo real con Web Speech API",
+      "Fuzzy word matching para sincronización tolerante a variaciones",
+      "Resaltado a nivel de palabra con scroll automático",
+      "Soporte multiidioma y selección de micrófono",
+      "App de escritorio con Tauri (Rust + React)",
     ],
-    tech: ["Python", "Node.js", "IoT"],
-    type: "automation",
-    github: null,
+    tech: ["Tauri", "React", "TypeScript", "Rust", "Web Speech API", "Tailwind CSS"],
+    type: "desktop",
+    github: "https://github.com/FaureGalliard/vocal-teleprompter",
     featureGroups: [],
     pipeline: [],
     gestures: [],
     videos: [],
   },
-  {
-  title: "Sastrería Landing Page",
-  description:
-    "Sistema web fullstack desarrollado para un negocio local real. Combina una landing page orientada a conversión con un panel administrativo privado para gestión de citas. Actualmente en producción y en uso por el cliente.",
-  tech: ["Next.js", "React", "Supabase", "Tailwind CSS", "Framer Motion", "TypeScript"],
-  type: "web",
-  github: null,
-  highlights: [
-    "Landing page con animaciones Framer Motion y diseño responsive",
-    "Autenticación segura con Supabase Auth y protección de rutas via middleware",
-    "Dashboard privado para gestión centralizada de citas",
-    "Botón flotante de WhatsApp con mensaje preconfigurado",
-    "Persistencia de datos en PostgreSQL (Supabase)",
-    "Deploy en Vercel — proyecto activo con cliente real",
-  ],
-  featureGroups: [],
-  pipeline: [],
-  gestures: [],
-  videos: [],
-},
 ];
