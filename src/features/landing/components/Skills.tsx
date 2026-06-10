@@ -1,5 +1,5 @@
-import Section from './common/Section'
-import Tag from './common/Tag'
+import Section from '@/shared/ui/Section'
+import Tag from '@/shared/ui/Tag'
 
 const TECH_STACK = [
     {

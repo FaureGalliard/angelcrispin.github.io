@@ -1,6 +1,7 @@
 'use client'
 import { motion } from 'framer-motion'
-import RoundedButton from './common/RoundedButton'
+import RoundedButton from '@/shared/ui/RoundedButton'
+
 const NAME = 'Angel Crispin'
 const ROLE = 'Software Engineer'
 const LOCATION = 'Lima, Perú'

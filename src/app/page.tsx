@@ -1,17 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import PageLoader from '@/components/PageLoader'
-import Contact from '@/components/Contact'
-import Services from '@/components/Services'
-import Navbar from '@/components/Navbar'
-import Hero from '@/components/Hero'
-import KPI from '@/components/Kpi'
-import About from '@/components/About'
-import Skills from '@/components/Skills'
-import Experience from '@/components/Experience'
-import Projects from '@/components/Projects'
-import Footer from '@/components/Footer'
+import PageLoader from '@/shared/providers/PageLoader'
+import Contact from '@/features/landing/components/Contact'
+import Services from '@/features/landing/components/Services'
+import Navbar from '@/features/navigation/navbar/components/Navbar'
+import Hero from '@/features/landing/components/Hero'
+import KPI from '@/features/landing/components/Kpi'
+import About from '@/features/landing/components/About'
+import Skills from '@/features/landing/components/Skills'
+import Experience from '@/features/landing/components/Experience'
+import Projects from '@/features/landing/components/Projects'
+import Footer from '@/shared/ui/Footer'
 
 export default function Page() {
     const [loaderDone, setLoaderDone] = useState(false)

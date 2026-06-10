@@ -1,8 +1,8 @@
 'use client'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import TransitionLink from './TransitionLink'
-import type { Project } from '@/data/Projects'
+import TransitionLink from '@/shared/ui/TransitionLink'
+import type { Project } from '@/data/projects'
 
 const TYPE_LABELS: Record<string, string> = {
     platform: 'Platform',

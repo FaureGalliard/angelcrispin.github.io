@@ -1,5 +1,5 @@
-import Section from './common/Section'
-import RoundedButton from './common/RoundedButton'
+import Section from '@/shared/ui/Section'
+import RoundedButton from '@/shared/ui/RoundedButton'
 
 const CONTACT_LINKS = [
     {

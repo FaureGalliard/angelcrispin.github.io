@@ -1,5 +1,5 @@
 'use client'
-import { usePageTransition } from '@/context/TransitionContext'
+import { usePageTransition } from '@/shared/context/TransitionContext'
 
 interface TransitionLinkProps {
     href: string

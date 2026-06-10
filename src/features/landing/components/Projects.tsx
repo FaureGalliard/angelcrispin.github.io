@@ -1,6 +1,6 @@
-import Section from './common/Section'
-import TransitionLink from './TransitionLink'
-import { projects } from '@/data/Projects'
+import Section from '@/shared/ui/Section'
+import TransitionLink from '@/shared/ui/TransitionLink'
+import { projects } from '@/data/projects'
 
 export default function Projects() {
     return (

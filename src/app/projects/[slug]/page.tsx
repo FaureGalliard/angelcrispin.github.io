@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { projects } from '@/data/Projects'
-import ProjectDetail from '@/components/ProjectDetail'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
+import { projects } from '@/data/projects'
+import ProjectDetail from '@/features/projects/components/ProjectDetail'
+import Navbar from '@/features/navigation/navbar/components/Navbar'
+import Footer from '@/shared/ui/Footer'
 
 export function generateStaticParams() {
     return projects.map((p) => ({ slug: p.slug }))

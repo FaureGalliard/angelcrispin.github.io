@@ -48,7 +48,6 @@ export default function PageLoader({ onComplete }: PageLoaderProps) {
             ref={loaderRef}
             className="fixed inset-0 z-[999] flex flex-col items-center justify-center"
             style={{ backgroundColor: '#1a1a1a' }}>
-            {/* Texto principal */}
             <div className="overflow-hidden">
                 <span
                     ref={textRef}

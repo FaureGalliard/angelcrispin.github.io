@@ -1,4 +1,4 @@
-import Section from './common/Section'
+import Section from '@/shared/ui/Section'
 
 const EXPERIENCE = [
     {

@@ -1,9 +1,9 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter, Fira_Code } from 'next/font/google';
-import SmoothScroll from '@/components/SmoothScroll';
-import HamburgerMenu from '@/components/HamburgerMenu';
-import TransitionProvider from '@/components/TransitionProvider';
+import SmoothScroll from '@/shared/providers/SmoothScroll';
+import HamburgerMenu from '@/features/navigation/hamburger/components/HamburgerMenu';
+import TransitionProvider from '@/shared/providers/TransitionProvider';
 
 const firaCode = Fira_Code({
     subsets: ['latin'],

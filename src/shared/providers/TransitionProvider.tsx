@@ -2,7 +2,7 @@
 import { useRef, useCallback, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import gsap from 'gsap'
-import { TransitionContext } from '@/context/TransitionContext'
+import { TransitionContext } from '@/shared/context/TransitionContext'
 
 export default function TransitionProvider({ children }: { children: React.ReactNode }) {
     const overlayRef = useRef<HTMLDivElement>(null)
@@ -10,7 +10,6 @@ export default function TransitionProvider({ children }: { children: React.React
     const pathname = usePathname()
     const isTransitioning = useRef(false)
 
-    // When pathname changes, slide the overlay OUT (if it was shown)
     useEffect(() => {
         const overlay = overlayRef.current
         if (!overlay || !isTransitioning.current) return

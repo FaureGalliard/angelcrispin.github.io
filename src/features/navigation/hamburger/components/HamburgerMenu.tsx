@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Link from 'next/link'
-import Magnetic from '@/components/common/Magnetic'
+import Magnetic from '@/shared/ui/Magnetic'
+import { useHamburger } from '../hooks/useHamburger'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -57,6 +57,7 @@ const slide = {
         transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] as const, delay: 0.05 * i },
     }),
 }
+
 const scaleVariants = {
     open: { scale: 1, transition: { duration: 0.3 } },
     closed: { scale: 0, transition: { duration: 0.4 } },
@@ -117,7 +118,6 @@ function BurgerButton({ isActive, onClick }: BurgerButtonProps) {
             onClick={onClick}
             onMouseEnter={onEnter}
             onMouseLeave={onLeave}>
-            {/* Barras → X */}
             <div className="flex flex-col gap-[5px] w-[22px] pointer-events-none z-10">
                 <span
                     className={`block w-full h-px bg-white origin-center transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.76,0,0.24,1)] ${
@@ -143,9 +143,7 @@ function BurgerButton({ isActive, onClick }: BurgerButtonProps) {
 // ─── Curve ────────────────────────────────────────────────────────────────────
 
 function Curve() {
-    const [height] = useState(() =>
-        typeof window !== 'undefined' ? window.innerHeight : 800,
-    )
+    const height = typeof window !== 'undefined' ? window.innerHeight : 800
 
     const initialPath = `M100 0 L100 ${height} Q-100 ${height / 2} 100 0`
     const targetPath = `M100 0 L100 ${height} Q100  ${height / 2} 100 0`
@@ -179,6 +177,7 @@ function Curve() {
 }
 
 // ─── NavLink ──────────────────────────────────────────────────────────────────
+
 function NavLink({ data, isActive, setSelectedIndicator }: NavLinkProps) {
     const { title, href, index } = data
     return (
@@ -198,7 +197,7 @@ function NavLink({ data, isActive, setSelectedIndicator }: NavLinkProps) {
                 />
                 <Link
                     href={href}
-                    className="text-[46px]  text-white no-underline  transition-opacity duration-200">
+                    className="text-[46px] text-white no-underline transition-opacity duration-200">
                     {title}
                 </Link>
             </motion.div>
@@ -220,7 +219,6 @@ function Nav() {
             exit="exit"
             className="fixed top-0 right-0 h-screen w-[400px] bg-[rgb(41,41,41)] text-white flex flex-col justify-between z-[999] overflow-hidden">
             <div className="flex flex-col gap-10 flex-1 pt-28 pb-10 px-10">
-                {/* Links */}
                 <div
                     onMouseLeave={() => setSelectedIndicator(pathname)}
                     className="flex flex-col gap-2">
@@ -239,23 +237,31 @@ function Nav() {
                     ))}
                 </div>
 
-                {/* Footer */}
-                <div className=" px-6  flex justify-between text-[12px] mt-15 text-gray">
+                <div className="px-6 flex justify-between text-[12px] mt-15 text-gray">
                     <div>
                         Version
                         <br />
                         <span className="text-[13px] text-white">2026</span>
                     </div>
-
-                    <div className="">
+                    <div>
                         Socials
                         <br />
-                        <a
-                            className="text-[13px] text-white"
-                            href="https://linkedin.com/in/angelcrispin"
-                            target="">
-                            Linkedin
-                        </a>
+                        <div className="flex gap-4 mt-[2px]">
+                            <a
+                                className="text-[13px] text-white hover:opacity-60 transition-opacity"
+                                href="https://linkedin.com/in/angelcrispin"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                LinkedIn
+                            </a>
+                            <a
+                                className="text-[13px] text-white hover:opacity-60 transition-opacity"
+                                href="https://github.com/FaureGalliard"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                GitHub
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -265,42 +271,10 @@ function Nav() {
     )
 }
 
+// ─── HamburgerMenu ────────────────────────────────────────────────────────────
+
 export default function HamburgerMenu() {
-    const [isActive, setIsActive] = useState(false)
-    const pathname = usePathname()
-    const buttonRef = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setIsActive(false)
-    }, [pathname])
-
-    useLayoutEffect(() => {
-        gsap.registerPlugin(ScrollTrigger)
-        gsap.set(buttonRef.current, { scale: 0 })
-
-        ScrollTrigger.create({
-            trigger: document.documentElement,
-            start: 'top top',
-            end: `+=${window.innerHeight}`,
-            onLeave: () =>
-                gsap.to(buttonRef.current, {
-                    scale: 1,
-                    duration: 0.25,
-                    ease: 'power1.out',
-                }),
-            onEnterBack: () => {
-                gsap.to(buttonRef.current, {
-                    scale: 0,
-                    duration: 0.25,
-                    ease: 'power1.out',
-                })
-                setIsActive(false)
-            },
-        })
-
-        return () => ScrollTrigger.getAll().forEach((t) => t.kill())
-    }, [])
+    const { state: { isActive }, handlers: { toggle }, refs: { buttonRef } } = useHamburger()
 
     return (
         <>
@@ -310,7 +284,7 @@ export default function HamburgerMenu() {
                 <Magnetic>
                     <BurgerButton
                         isActive={isActive}
-                        onClick={() => setIsActive((prev) => !prev)}
+                        onClick={toggle}
                     />
                 </Magnetic>
             </div>
