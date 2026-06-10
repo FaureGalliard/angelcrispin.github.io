@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter, Fira_Code } from 'next/font/google';
 import SmoothScroll from '@/components/SmoothScroll';
 import HamburgerMenu from '@/components/HamburgerMenu';
+import TransitionProvider from '@/components/TransitionProvider';
 
 const firaCode = Fira_Code({
     subsets: ['latin'],
@@ -57,8 +58,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang='es' className={`${inter.variable} ${firaCode.variable} antialiased`}>
             <body>
                 <SmoothScroll>
-                    <HamburgerMenu />
-                    {children}
+                    <TransitionProvider>
+                        <HamburgerMenu />
+                        {children}
+                    </TransitionProvider>
                 </SmoothScroll>
             </body>
         </html>

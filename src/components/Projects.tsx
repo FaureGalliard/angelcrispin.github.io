@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import Section from './common/Section'
+import TransitionLink from './TransitionLink'
 import { projects } from '@/data/Projects'
 
 export default function Projects() {
@@ -7,12 +7,11 @@ export default function Projects() {
         <Section
             id="projects"
             label="Projects">
-            {projects.map(({ title, description, tech, github }) => (
-                <Link
-                    key={title}
-                    href={github ?? '#'}
-                    target={github ? '_blank' : undefined}
-                    className="group grid grid-cols-[1fr_auto] items-start gap-4 py-7 border-t border-gray/20 last:border-b last:border-gray/20">
+            {projects.map(({ slug, title, description, tech }) => (
+                <TransitionLink
+                    key={slug}
+                    href={`/projects/${slug}`}
+                    className="group grid grid-cols-[1fr_auto] items-start gap-4 py-7 border-t border-gray/20 last:border-b last:border-gray/20 block">
                     <div>
                         <p className="text-[15px] font-semibold text-black mb-1.5 group-hover:underline">
                             {title}
@@ -30,10 +29,8 @@ export default function Projects() {
                             ))}
                         </div>
                     </div>
-                    <span className={`text-lg mt-0.5 ${github ? 'text-gray/40' : 'text-gray/20'}`}>
-                        {github ? '↗' : '—'}
-                    </span>
-                </Link>
+                    <span className="text-lg text-gray/40 mt-0.5">→</span>
+                </TransitionLink>
             ))}
         </Section>
     )
